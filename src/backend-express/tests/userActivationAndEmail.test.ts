@@ -236,3 +236,54 @@ describe("emailAllUsers filters to active users and valid emails", () => {
     );
   }, 15000);
 });
+
+describe("SMTP transport fallback", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.resetModules();
+  });
+
+  it("allows anonymous transport when credentials are absent", async () => {
+    await withEnv(
+      {
+        NODE_ENV: "development",
+        SMTP_DISABLE: "false",
+        SMTP_DRY_RUN: "false",
+        SMTP_HOST: "smtp.test.local",
+        SMTP_USER: "",
+        SMTP_PASS: "",
+        SMTP_QUEUE_INTERVAL_MS: "0",
+        SMTP_QUEUE_PATH: "./tmp/test-email-queue.json",
+      },
+      async () => {
+        const verifyMock = vi.fn().mockResolvedValue(undefined);
+        const sendMailMock = vi.fn().mockResolvedValue({});
+        const createTransportMock = vi.fn(() => ({
+          verify: verifyMock,
+          sendMail: sendMailMock,
+        }));
+
+        vi.doMock("nodemailer", () => ({
+          default: { createTransport: createTransportMock },
+          createTransport: createTransportMock,
+        }));
+
+        const tx = await import("../services/txEmail");
+        await expect(
+          tx.sendEmail("alice@example.com", "Sujet", "Contenu", "SYSTEM_TEST"),
+        ).resolves.toBeUndefined();
+
+        expect(createTransportMock).toHaveBeenCalledTimes(1);
+        const options = createTransportMock.mock.calls[0][0];
+        expect(options.host).toBe("smtp.test.local");
+        expect(options.auth).toBeUndefined();
+        expect(verifyMock).toHaveBeenCalledTimes(1);
+        expect(sendMailMock).toHaveBeenCalledTimes(1);
+      },
+    );
+  });
+});
