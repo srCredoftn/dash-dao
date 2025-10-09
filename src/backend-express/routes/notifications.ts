@@ -7,7 +7,7 @@ Liens: services (métier), middleware (auth, validation), repositories (persista
 Sécurité: veille à la validation d’entrée, gestion JWT/refresh, et limites de débit
 */
 import express from "express";
-import { authenticate } from "../middleware/auth";
+import { authenticate, requireAdmin } from "../middleware/auth";
 import { NotificationService } from "../services/notificationService";
 
 const router = express.Router();
