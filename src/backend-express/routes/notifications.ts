@@ -46,12 +46,32 @@ router.put("/read-all", authenticate, (req, res) => {
 
 /**
  * POST /api/notifications/test-email
- * Désactivé (service d'email désactivé).
+ * Envoie un e-mail de test à l’administrateur pour vérifier la configuration SMTP.
+ * Sécurité: admin uniquement.
  */
-router.post("/test-email", authenticate, async (_req, res) => {
-  return res
-    .status(501)
-    .json({ ok: false, error: "Service d’e-mail désactivé" });
+router.post("/test-email", authenticate, async (req, res) => {
+  try {
+    const { requireAdmin } = await import("../middleware/auth");
+    // Exécuter le middleware requireAdmin manuellement ici
+    await new Promise<void>((resolve, reject) => {
+      (requireAdmin as any)(req, res, (err?: any) => (err ? reject(err) : resolve()));
+    });
+
+    const { sendEmail } = await import("../services/txEmail");
+    const to = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    if (!to) {
+      return res.status(400).json({ ok: false, error: "ADMIN_EMAIL manquant" });
+    }
+    await sendEmail(
+      to,
+      "[Test] Vérification de l’envoi d’e-mail",
+      "Ceci est un e-mail de test généré par /api/notifications/test-email.",
+      "SYSTEM_TEST",
+    );
+    return res.json({ ok: true });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: String((e as Error)?.message || e) });
+  }
 });
 
 export default router;
