@@ -15,6 +15,8 @@ import type { DaoTask } from "@shared/dao";
 import { DaoService } from "../services/daoService";
 import { Templates, emailAllUsers, sendEmail } from "../services/txEmail";
 import { logger } from "../utils/logger";
+import { NotificationService } from "../services/notificationService";
+import { tplTaskNotification } from "../services/notificationTemplates";
 
 const router = express.Router();
 
@@ -110,7 +112,7 @@ router.post(
 
       logger.audit("Task created", req.user?.id, req.ip);
 
-      // E-mails
+      // E-mails + notification (sans mirroring email)
       try {
         const daoFull = await DaoService.getDaoById(daoId);
         if (daoFull) {
@@ -129,6 +131,22 @@ router.post(
               await sendEmail(m.email, t.subject, t.body, "TASK_ASSIGNED");
             }
           }
+          // In-app notification (éviter doublon email via skipEmailMirror)
+          try {
+            const notif = tplTaskNotification({
+              dao: daoFull,
+              previous: null,
+              current: newTask,
+              changeType: "general",
+              added: newTask.assignedTo || [],
+            });
+            NotificationService.broadcast(
+              notif.type,
+              notif.title,
+              notif.message,
+              { ...(notif.data || {}), skipEmailMirror: true },
+            );
+          } catch {}
         }
       } catch (_) {}
 
@@ -215,7 +233,7 @@ router.put(
           )
         : DaoService.updateDao(daoId, { tasks: dao.tasks }));
 
-      // E-mails
+      // E-mails + notification (éviter mirroring)
       try {
         if (dao) {
           const t = Templates.task.updated({
@@ -225,6 +243,20 @@ router.put(
             action: "Mise à jour",
           });
           await emailAllUsers(t.subject, t.body, "TASK_UPDATED");
+          try {
+            const notif = tplTaskNotification({
+              dao,
+              previous,
+              current: task,
+              changeType: "general",
+            });
+            NotificationService.broadcast(
+              notif.type,
+              notif.title,
+              notif.message,
+              { ...(notif.data || {}), skipEmailMirror: true },
+            );
+          } catch {}
         }
       } catch (_) {}
 
