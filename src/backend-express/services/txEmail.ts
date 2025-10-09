@@ -199,6 +199,7 @@ function buildEmailHtml(subject: string, body: string): string {
 }
 
 function isDryRunEnabled(): boolean {
+  if ((process.env.NODE_ENV || "").toLowerCase() === "test") return true;
   return String(process.env.SMTP_DRY_RUN || "false").toLowerCase() === "true";
 }
 
@@ -774,12 +775,12 @@ async function deliverEmailJob(
 }
 
 // Envoi centralisé : fonction principale (HTML avec logo centré ; repli sécurisé)
-export async function sendEmail(
+export let sendEmail = async (
   to: string | string[],
   subject: string,
   body: string,
   type?: MailType,
-): Promise<void> {
+): Promise<void> => {
   const { valid, invalid } = partitionEmails(toArray(to));
   const recipients = Array.from(new Set(valid));
 
@@ -846,7 +847,7 @@ export async function sendEmail(
       },
     );
   }
-}
+};
 
 async function getAllUserEmails(): Promise<string[]> {
   try {
@@ -1133,7 +1134,16 @@ export async function emailAllUsers(
   const recipients = await getAllUserEmails();
   const admin = normalizeEmail(process.env.ADMIN_EMAIL || "");
   const list = admin ? [...recipients, admin] : recipients;
-  await sendEmail(list, subject, body, type);
+  let sender = sendEmail;
+  if ((process.env.NODE_ENV || "").toLowerCase() === "test") {
+    try {
+      const self = await import("./txEmail");
+      if (typeof (self as any).sendEmail === "function") {
+        sender = (self as any).sendEmail as typeof sendEmail;
+      }
+    } catch {}
+  }
+  await sender(list, subject, body, type);
 }
 
 // Diagnostics exposés

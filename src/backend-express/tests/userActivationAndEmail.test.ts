@@ -220,7 +220,9 @@ describe("emailAllUsers filters to active users and valid emails", () => {
         }));
 
         const tx: any = await vi.importActual("../services/txEmail");
-        const spy = vi.spyOn(tx, "sendEmail").mockResolvedValue();
+        const spy = vi
+          .spyOn(tx, "sendEmail")
+          .mockResolvedValue(undefined as any);
         await tx.emailAllUsers("Subject", "Body", "SYSTEM_TEST");
 
         expect(spy).toHaveBeenCalledTimes(1);
