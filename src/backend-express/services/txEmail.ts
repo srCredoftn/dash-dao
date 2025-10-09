@@ -4,7 +4,7 @@ Domaine: Backend/Services
 Exports: MailType, computeDaoProgress, Templates
 Dépendances: ../utils/logger, @shared/dao
 Liens: appels /api, utils de fetch, types @shared/*
-S��curité: veille à la validation d���entrée, gestion JWT/refresh, envoi mail robuste
+S��curité: veille à la validation d����entrée, gestion JWT/refresh, envoi mail robuste
 Performance: cache/partitionnement/bundling optimisés
 */
 import { randomUUID } from "node:crypto";
@@ -402,62 +402,66 @@ async function getTransport(excludeHosts: string[] = []) {
       }
     }
 
-    // Helper to create transport and verify quickly
-    async function tryTransport(cfg: (typeof candidates)[number]) {
-      if (!cfg.host || !cfg.user || !cfg.pass) {
-        throw new Error(`incomplete-config:${cfg.name}`);
+    type TransportMeta = {
+      transport: nodemailer.Transporter;
+      host: string;
+      name: string;
+      mode: "authenticated" | "anonymous";
+    };
+
+    const errors: string[] = [];
+    let firstTransport: TransportMeta | null = null;
+
+    const buildTransport = (cfg: (typeof candidates)[number]): TransportMeta => {
+      if (!cfg.host) {
+        throw new Error(`missing-host:${cfg.name}`);
       }
-      if (excludeHosts.includes(cfg.host!))
+      if (excludeHosts.includes(cfg.host)) {
         throw new Error(`excluded-host:${cfg.name}`);
-      const transport = nodemailer.createTransport({
+      }
+
+      const options: any = {
         host: cfg.host,
         port: cfg.port,
         secure: cfg.secure,
-        auth: { user: cfg.user, pass: cfg.pass },
         connectionTimeout: 15000,
         socketTimeout: 20000,
         tls: { rejectUnauthorized: false },
-      } as any);
-      await transport.verify();
-      return { transport, host: cfg.host, name: cfg.name };
-    }
+      };
 
-    const errors: string[] = [];
-    let firstTransport: any = null;
+      let mode: TransportMeta["mode"] = "anonymous";
+      if (cfg.user && cfg.pass) {
+        options.auth = { user: cfg.user, pass: cfg.pass };
+        mode = "authenticated";
+      } else if (cfg.user || cfg.pass) {
+        logger.warn("Identifiants SMTP partiels, tentative en mode anonyme", "MAIL", {
+          name: cfg.name,
+        });
+      }
+
+      return {
+        transport: nodemailer.createTransport(options),
+        host: cfg.host,
+        name: cfg.name,
+        mode,
+      };
+    };
 
     for (const cfg of candidates) {
       try {
-        // skip incomplete candidate but remember primary for fallback return
-        if (!firstTransport && cfg.host && cfg.user && cfg.pass) {
-          // create but don't verify primary until we try
-          firstTransport = {
-            transport: nodemailer.createTransport({
-              host: cfg.host,
-              port: cfg.port,
-              secure: cfg.secure,
-              auth: { user: cfg.user, pass: cfg.pass },
-              connectionTimeout: 15000,
-              socketTimeout: 20000,
-              tls: { rejectUnauthorized: false },
-            } as any),
-            host: cfg.host,
-            name: cfg.name,
-          };
+        const meta = buildTransport(cfg);
+        if (!firstTransport) {
+          firstTransport = meta;
         }
 
-        if (!cfg.host || !cfg.user || !cfg.pass) {
-          errors.push(`${cfg.name}: incomplete`);
-          continue;
-        }
-
-        const verified = await tryTransport(cfg);
+        await meta.transport.verify();
         lastTransportError = null;
-        // success
         logger.info(`SMTP transport verified (${cfg.name})`, "MAIL", {
           host: cfg.host,
           name: cfg.name,
+          mode: meta.mode,
         });
-        return verified;
+        return meta;
       } catch (e) {
         const msg = String((e as Error)?.message || e);
         errors.push(`${cfg.name}: ${msg}`);
@@ -466,11 +470,9 @@ async function getTransport(excludeHosts: string[] = []) {
           name: cfg.name,
           message: msg,
         });
-        // continue to next candidate
       }
     }
 
-    // If none verified, return the first transport (primary) if available (best-effort)
     if (firstTransport) {
       lastTransportError = errors.join(" | ");
       logger.warn(
@@ -478,6 +480,9 @@ async function getTransport(excludeHosts: string[] = []) {
         "MAIL",
         {
           errors: errors.slice(0, 5),
+          host: firstTransport.host,
+          name: firstTransport.name,
+          mode: firstTransport.mode,
         },
       );
       return firstTransport;
