@@ -448,7 +448,7 @@ router.put(
               const res = await AuthService.ensureActiveUserByEmail(
                 String(member.email).trim(),
                 member.name || String(member.email),
-                { allowCreate: false },
+                { allowCreate: true },
               );
               if (res && res.user) {
                 // log successes in audit store
