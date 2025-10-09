@@ -248,11 +248,18 @@ class InMemoryNotificationService {
           );
           return;
         }
-        await retryAsync(() => sendEmail(recipients, subject, body, undefined), 3);
-        logger.info("Miroir email (diffusion+équipe) envoyé avec succès", "MAIL", {
-          type: item.type,
-          count: recipients.length,
-        });
+        await retryAsync(
+          () => sendEmail(recipients, subject, body, undefined),
+          3,
+        );
+        logger.info(
+          "Miroir email (diffusion+équipe) envoyé avec succès",
+          "MAIL",
+          {
+            type: item.type,
+            count: recipients.length,
+          },
+        );
         return;
       }
 
