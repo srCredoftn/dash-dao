@@ -57,9 +57,33 @@ export default function AdminHealth() {
               <pre className="text-xs text-destructive whitespace-pre-wrap">{error}</pre>
             )}
             {diag && (
-              <div className="space-y-2 text-sm">
-                <div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
                   <div className="font-medium">Configuration SMTP</div>
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const res = await secureFetch("/api/notifications/test-email", { method: "POST" });
+                        if (res.ok) {
+                          setDiag(null);
+                          const d = await (await secureFetch("/api/system/mail/diagnostics")).json();
+                          setDiag(d);
+                          // toast success minimal via alert-style
+                          alert("E-mail de test envoyé (consultez votre boîte)\nVérifiez aussi la section Événements récents.");
+                        } else {
+                          const j = await res.json().catch(() => ({}));
+                          alert(`Échec de l'envoi de test: ${j?.error || res.statusText}`);
+                        }
+                      } catch (e) {
+                        alert(String((e as Error)?.message || e));
+                      }
+                    }}
+                  >
+                    Envoyer un e-mail de test
+                  </Button>
+                </div>
+                <div>
                   <div className="grid grid-cols-2 gap-2 text-muted-foreground">
                     <div>Host</div>
                     <div className="text-foreground">{String(diag?.config?.host || "-")}</div>
@@ -94,9 +118,7 @@ export default function AdminHealth() {
                     <ul className="list-disc pl-5 text-muted-foreground">
                       {diag.recent.map((e: any, idx: number) => (
                         <li key={idx} className="text-xs">
-                          <span className="text-foreground">[{e.ts}]</span> {e.subject} —
-                          {" "}
-                          {e.success ? "succès" : `échec: ${e.error || ""}`}
+                          <span className="text-foreground">[{e.ts}]</span> {e.subject} — {e.success ? "succès" : `échec: ${e.error || ""}`}
                         </li>
                       ))}
                     </ul>
