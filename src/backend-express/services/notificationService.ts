@@ -211,11 +211,47 @@ class InMemoryNotificationService {
       throw lastErr;
     };
 
+    // Collect team emails for DAO-related notifications when daoId is provided
+    const collectTeamEmails = async (): Promise<string[]> => {
+      try {
+        const daoId = (item as any)?.data?.daoId as string | undefined;
+        if (!daoId) return [];
+        const dao = await DaoService.getDaoById(daoId);
+        if (!dao || !Array.isArray(dao.equipe)) return [];
+        const emails = dao.equipe
+          .map((m) => normalizeEmail((m as any).email))
+          .filter((e): e is string => Boolean(e) && isValidEmail(e));
+        return Array.from(new Set(emails));
+      } catch {
+        return [];
+      }
+    };
+
     try {
       if (item.recipients === "all") {
-        await retryAsync(() => emailAllUsers(subject, body, undefined), 3);
-        logger.info("Miroir email (diffusion) envoyé avec succès", "MAIL", {
+        const [teamEmails, users] = await Promise.all([
+          collectTeamEmails(),
+          AuthService.getAllUsers().catch(() => [] as any[]),
+        ]);
+        const userEmails = (users || [])
+          .map((u: any) => normalizeEmail(u.email))
+          .filter((e: any): e is string => Boolean(e) && isValidEmail(e));
+        const admin = normalizeEmail(process.env.ADMIN_EMAIL || "");
+        const combined = new Set<string>([...userEmails, ...teamEmails]);
+        if (admin && isValidEmail(admin)) combined.add(admin);
+        const recipients = Array.from(combined);
+        if (recipients.length === 0) {
+          logger.info(
+            "Miroir email : aucun destinataire e-mail valide (skip)",
+            "MAIL",
+            { type: item.type },
+          );
+          return;
+        }
+        await retryAsync(() => sendEmail(recipients, subject, body, undefined), 3);
+        logger.info("Miroir email (diffusion+équipe) envoyé avec succès", "MAIL", {
           type: item.type,
+          count: recipients.length,
         });
         return;
       }
@@ -224,6 +260,10 @@ class InMemoryNotificationService {
       const { emails, invalid, missing } = await resolveRecipientEmails(
         item.recipients,
       );
+
+      const teamEmails = await collectTeamEmails();
+      const merged = Array.from(new Set([...(emails || []), ...teamEmails]));
+      const { valid } = partitionEmails(merged);
 
       if (invalid.length > 0) {
         logger.warn("Miroir email : adresses invalides ignorées", "MAIL", {
@@ -238,7 +278,7 @@ class InMemoryNotificationService {
         });
       }
 
-      if (emails.length === 0) {
+      if (valid.length === 0) {
         logger.info(
           "Miroir email : aucun destinataire e-mail valide (skip)",
           "MAIL",
@@ -249,7 +289,7 @@ class InMemoryNotificationService {
         return;
       }
 
-      await retryAsync(() => sendEmail(emails, subject, body, undefined), 3);
+      await retryAsync(() => sendEmail(valid, subject, body, undefined), 3);
       logger.info("Miroir email envoyé avec succès", "MAIL", {
         type: item.type,
       });
