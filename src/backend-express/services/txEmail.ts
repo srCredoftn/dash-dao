@@ -10,7 +10,7 @@ Performance: cache/partitionnement/bundling optimisés
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
 import { logger } from "../utils/logger";
 import { normalizeEmail, partitionEmails } from "../utils/email";
 import type { Dao, DaoTask } from "@shared/dao";
