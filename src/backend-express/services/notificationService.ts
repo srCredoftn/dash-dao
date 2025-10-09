@@ -7,9 +7,10 @@ Liens: appels /api, utils de fetch, types @shared/*
 import { emailAllUsers, sendEmail } from "./txEmail";
 import { AuthService } from "./authService";
 import { logger } from "../utils/logger";
-import { isValidEmail, normalizeEmail } from "../utils/email";
+import { isValidEmail, normalizeEmail, partitionEmails } from "../utils/email";
 import { MongoNotificationRepository } from "../repositories/mongoNotificationRepository";
 import { MemoryNotificationRepository } from "../repositories/memoryNotificationRepository";
+import { DaoService } from "./daoService";
 
 export type NotificationType =
   | "role_update"
