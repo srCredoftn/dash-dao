@@ -199,6 +199,7 @@ function buildEmailHtml(subject: string, body: string): string {
 }
 
 function isDryRunEnabled(): boolean {
+  if ((process.env.NODE_ENV || "").toLowerCase() === "test") return true;
   return String(process.env.SMTP_DRY_RUN || "false").toLowerCase() === "true";
 }
 
