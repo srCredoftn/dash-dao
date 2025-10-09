@@ -4,7 +4,7 @@ Domaine: Backend/Services
 Exports: NotificationType, ServerNotification, NotificationService
 Liens: appels /api, utils de fetch, types @shared/*
 */
-import { emailAllUsers, sendEmail } from "./txEmail";
+import { sendEmail } from "./txEmail";
 import { AuthService } from "./authService";
 import { logger } from "../utils/logger";
 import { isValidEmail, normalizeEmail, partitionEmails } from "../utils/email";
