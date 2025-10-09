@@ -1,0 +1,19 @@
+name: DAST - OWASP ZAP Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Staging URL to scan (https://...)"
+        required: true
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.13.0
+        with:
+          target: ${{ github.event.inputs.target }}
+          rules_file_name: ".zap/rules.tsv"
+          cmd_options: "-a"
