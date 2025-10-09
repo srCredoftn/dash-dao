@@ -412,7 +412,9 @@ async function getTransport(excludeHosts: string[] = []) {
     const errors: string[] = [];
     let firstTransport: TransportMeta | null = null;
 
-    const buildTransport = (cfg: (typeof candidates)[number]): TransportMeta => {
+    const buildTransport = (
+      cfg: (typeof candidates)[number],
+    ): TransportMeta => {
       if (!cfg.host) {
         throw new Error(`missing-host:${cfg.name}`);
       }
@@ -434,9 +436,13 @@ async function getTransport(excludeHosts: string[] = []) {
         options.auth = { user: cfg.user, pass: cfg.pass };
         mode = "authenticated";
       } else if (cfg.user || cfg.pass) {
-        logger.warn("Identifiants SMTP partiels, tentative en mode anonyme", "MAIL", {
-          name: cfg.name,
-        });
+        logger.warn(
+          "Identifiants SMTP partiels, tentative en mode anonyme",
+          "MAIL",
+          {
+            name: cfg.name,
+          },
+        );
       }
 
       return {
