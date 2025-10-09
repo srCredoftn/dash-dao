@@ -403,7 +403,7 @@ async function getTransport(excludeHosts: string[] = []) {
     }
 
     type TransportMeta = {
-      transport: nodemailer.Transporter;
+      transport: Transporter;
       host: string;
       name: string;
       mode: "authenticated" | "anonymous";
