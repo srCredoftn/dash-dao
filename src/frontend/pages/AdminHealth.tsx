@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import secureFetch from "@/utils/secure-fetch";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminHealth() {
   const { isAdmin } = useAuth();
