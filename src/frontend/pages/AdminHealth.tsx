@@ -54,7 +54,9 @@ export default function AdminHealth() {
               est configuré.
             </p>
             {error && (
-              <pre className="text-xs text-destructive whitespace-pre-wrap">{error}</pre>
+              <pre className="text-xs text-destructive whitespace-pre-wrap">
+                {error}
+              </pre>
             )}
             {diag && (
               <div className="space-y-3 text-sm">
@@ -64,16 +66,25 @@ export default function AdminHealth() {
                     size="sm"
                     onClick={async () => {
                       try {
-                        const res = await secureFetch("/api/notifications/test-email", { method: "POST" });
+                        const res = await secureFetch(
+                          "/api/notifications/test-email",
+                          { method: "POST" },
+                        );
                         if (res.ok) {
                           setDiag(null);
-                          const d = await (await secureFetch("/api/system/mail/diagnostics")).json();
+                          const d = await (
+                            await secureFetch("/api/system/mail/diagnostics")
+                          ).json();
                           setDiag(d);
                           // toast success minimal via alert-style
-                          alert("E-mail de test envoyé (consultez votre boîte)\nVérifiez aussi la section Événements récents.");
+                          alert(
+                            "E-mail de test envoyé (consultez votre boîte)\nVérifiez aussi la section Événements récents.",
+                          );
                         } else {
                           const j = await res.json().catch(() => ({}));
-                          alert(`Échec de l'envoi de test: ${j?.error || res.statusText}`);
+                          alert(
+                            `Échec de l'envoi de test: ${j?.error || res.statusText}`,
+                          );
                         }
                       } catch (e) {
                         alert(String((e as Error)?.message || e));
@@ -86,30 +97,50 @@ export default function AdminHealth() {
                 <div>
                   <div className="grid grid-cols-2 gap-2 text-muted-foreground">
                     <div>Host</div>
-                    <div className="text-foreground">{String(diag?.config?.host || "-")}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.host || "-")}
+                    </div>
                     <div>Port</div>
-                    <div className="text-foreground">{String(diag?.config?.port || "-")}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.port || "-")}
+                    </div>
                     <div>Sécurisé (TLS)</div>
-                    <div className="text-foreground">{String(diag?.config?.secure)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.secure)}
+                    </div>
                     <div>From</div>
-                    <div className="text-foreground">{String(diag?.config?.from || "-")}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.from || "-")}
+                    </div>
                     <div>Désactivé</div>
-                    <div className="text-foreground">{String(diag?.config?.disabled)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.disabled)}
+                    </div>
                     <div>Dry-run</div>
-                    <div className="text-foreground">{String(diag?.config?.dryRun)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.config?.dryRun)}
+                    </div>
                   </div>
                 </div>
                 <div>
                   <div className="font-medium">Statistiques</div>
                   <div className="grid grid-cols-2 gap-2 text-muted-foreground">
                     <div>Total envoyés</div>
-                    <div className="text-foreground">{String(diag?.stats?.totalSent || 0)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.stats?.totalSent || 0)}
+                    </div>
                     <div>Total échoués</div>
-                    <div className="text-foreground">{String(diag?.stats?.totalFailed || 0)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.stats?.totalFailed || 0)}
+                    </div>
                     <div>En file (mémoire)</div>
-                    <div className="text-foreground">{String(diag?.queue?.inMemory || 0)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.queue?.inMemory || 0)}
+                    </div>
                     <div>En file (persistés)</div>
-                    <div className="text-foreground">{String(diag?.queue?.persisted || 0)}</div>
+                    <div className="text-foreground">
+                      {String(diag?.queue?.persisted || 0)}
+                    </div>
                   </div>
                 </div>
                 {Array.isArray(diag?.recent) && diag.recent.length > 0 && (
@@ -118,7 +149,9 @@ export default function AdminHealth() {
                     <ul className="list-disc pl-5 text-muted-foreground">
                       {diag.recent.map((e: any, idx: number) => (
                         <li key={idx} className="text-xs">
-                          <span className="text-foreground">[{e.ts}]</span> {e.subject} — {e.success ? "succès" : `échec: ${e.error || ""}`}
+                          <span className="text-foreground">[{e.ts}]</span>{" "}
+                          {e.subject} —{" "}
+                          {e.success ? "succès" : `échec: ${e.error || ""}`}
                         </li>
                       ))}
                     </ul>

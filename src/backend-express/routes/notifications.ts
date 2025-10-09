@@ -64,7 +64,9 @@ router.post("/test-email", authenticate, requireAdmin, async (_req, res) => {
     );
     return res.json({ ok: true });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: String((e as Error)?.message || e) });
+    return res
+      .status(500)
+      .json({ ok: false, error: String((e as Error)?.message || e) });
   }
 });
 
