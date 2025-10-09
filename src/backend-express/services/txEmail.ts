@@ -775,12 +775,12 @@ async function deliverEmailJob(
 }
 
 // Envoi centralisé : fonction principale (HTML avec logo centré ; repli sécurisé)
-export async function sendEmail(
+export let sendEmail = async (
   to: string | string[],
   subject: string,
   body: string,
   type?: MailType,
-): Promise<void> {
+): Promise<void> => {
   const { valid, invalid } = partitionEmails(toArray(to));
   const recipients = Array.from(new Set(valid));
 
@@ -847,7 +847,7 @@ export async function sendEmail(
       },
     );
   }
-}
+};
 
 async function getAllUserEmails(): Promise<string[]> {
   try {
