@@ -49,14 +49,8 @@ router.put("/read-all", authenticate, (req, res) => {
  * Envoie un e-mail de test à l’administrateur pour vérifier la configuration SMTP.
  * Sécurité: admin uniquement.
  */
-router.post("/test-email", authenticate, async (req, res) => {
+router.post("/test-email", authenticate, requireAdmin, async (_req, res) => {
   try {
-    const { requireAdmin } = await import("../middleware/auth");
-    // Exécuter le middleware requireAdmin manuellement ici
-    await new Promise<void>((resolve, reject) => {
-      (requireAdmin as any)(req, res, (err?: any) => (err ? reject(err) : resolve()));
-    });
-
     const { sendEmail } = await import("../services/txEmail");
     const to = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
     if (!to) {
