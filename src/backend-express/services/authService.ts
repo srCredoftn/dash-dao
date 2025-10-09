@@ -849,7 +849,7 @@ export class AuthService {
     const user = await repo.findByEmail(email.toLowerCase());
     if (!user) return null;
     const crypto = require("crypto");
-    const token = crypto.randomBytes(32).toString("hex");
+    const token = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
     const expires = new Date(Date.now() + 15 * 60 * 1000);
     resetTokens[token] = { email: user.email, expires };
 
