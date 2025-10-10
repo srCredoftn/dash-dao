@@ -344,6 +344,15 @@ export default function History() {
   }, [notifications]);
 
   const navigate = useNavigate();
+  const taskCardVariant = stats.taskCount > 0 ? "urgent" : "completed";
+  const daoDescription =
+    stats.daoActivity > 0
+      ? `${stats.daoActivity} notification${stats.daoActivity > 1 ? "s" : ""} liées`
+      : "Aucune notification liée";
+  const taskDescription =
+    stats.taskCount > 0
+      ? `${stats.taskCount} notification${stats.taskCount > 1 ? "s" : ""} tâche`
+      : "Aucune alerte tâche";
 
   return (
     <div className="min-h-screen bg-background">
