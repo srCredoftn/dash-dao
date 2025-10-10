@@ -206,7 +206,8 @@ function isDryRunEnabled(): boolean {
 
 function isTemporarySmtpError(code: string, message: string): boolean {
   const normalizedCode = (code || "").toString().trim().toUpperCase();
-  if (!normalizedCode) return /timeout|temporar|retry/i.test(message || "");
+  const msg = String(message || "");
+  if (!normalizedCode) return /timeout|temporar|retry/i.test(msg);
   const temporaryCodes = new Set([
     "ETIMEDOUT",
     "ESOCKETTIMEDOUT",
@@ -224,7 +225,14 @@ function isTemporarySmtpError(code: string, message: string): boolean {
   if (temporaryCodes.has(normalizedCode)) return true;
   if (/^4\d\d$/.test(normalizedCode)) return true;
   if (normalizedCode === "421") return true;
-  return /temporary|timeout|try again|later|rate limit/i.test(message || "");
+  // Treat common quota/rate scenarios as temporary to trigger fallback/backoff
+  if (
+    normalizedCode === "554" ||
+    /quota|limit on the number of allowed outgoing messages|too many messages|rate limit|exceeded/i.test(msg)
+  ) {
+    return true;
+  }
+  return /temporary|timeout|try again|later|rate limit/i.test(msg);
 }
 
 async function persistQueueSnapshot() {
@@ -954,7 +962,7 @@ export const Templates = {
       const { dao, prevLeader, newLeader, members = [] } = ctx;
       const base = `DAO : ${dao.objetDossier} (${dao.reference})\nAutorité contractante : ${dao.autoriteContractante}\nDate de dépôt : ${frDate(dao.dateDepot)}`;
       const toNewLeader = {
-        subject: `Changement de chef d’équipe ��� ${dao.objetDossier}`,
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
         body: [
           base,
           "",
