@@ -42,6 +42,7 @@ export type MailType =
   | "TASK_ASSIGNED"
   | "TASK_REASSIGNED"
   | "TASK_COMMENTED"
+  | "TEAM_LEAD_CHANGED"
   | "AUTH_PASSWORD_RESET"
   | "AUTH_PASSWORD_CHANGED"
   | "SYSTEM_TEST";
@@ -953,7 +954,7 @@ export const Templates = {
       const { dao, prevLeader, newLeader, members = [] } = ctx;
       const base = `DAO : ${dao.objetDossier} (${dao.reference})\nAutorité contractante : ${dao.autoriteContractante}\nDate de dépôt : ${frDate(dao.dateDepot)}`;
       const toNewLeader = {
-        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        subject: `Changement de chef d’équipe ��� ${dao.objetDossier}`,
         body: [
           base,
           "",
