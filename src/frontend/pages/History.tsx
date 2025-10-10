@@ -167,7 +167,7 @@ function parseDaoUpdated(message: string, data: any) {
   // First block: metadata (Numéro de liste, Autorité, Date...)
   while (i < work.length) {
     const ln = work[i];
-    if (ln === "Équipe :" || ln === "Tâches modifi��es :") break;
+    if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
     // Stop metadata when we hit first pair-specific change like "… antérieur :"
     if (/antérieu|modifié/i.test(ln)) break;
     result.summary.push(ln);
@@ -321,7 +321,7 @@ export default function History() {
       const { daoId, daoNumber } = getDaoMeta(item);
       if (daoId) {
         uniqueDaoIds.add(String(daoId));
-      } else if (daoNumber && daoNumber !== "—") {
+      } else if (daoNumber && daoNumber !== "��") {
         uniqueDaoIds.add(String(daoNumber));
       }
     });
@@ -540,7 +540,10 @@ export default function History() {
               const lines = splitLines(notification.message);
 
               return (
-                <Card key={notification.id} className="border-border/80">
+                <Card
+                  key={notification.id}
+                  className="rounded-2xl border border-border/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg overflow-hidden"
+                >
                   <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <CardTitle className="text-base font-semibold">
