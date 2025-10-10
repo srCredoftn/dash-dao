@@ -403,7 +403,44 @@ export default function History() {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 py-6 space-y-6">
-        <Card>
+        <section>
+          <div className={cn(GRID_CLASSES.stats, "gap-3 sm:gap-4")}>
+            <StatsCard
+              title="Total"
+              value={stats.total}
+              description="Notifications enregistrées"
+              icon={PieChart}
+              variant="total"
+            />
+            <StatsCard
+              title="Aujourd'hui"
+              value={stats.recent}
+              description={
+                stats.recent > 1
+                  ? "Notifications aujourd'hui"
+                  : "Notification aujourd'hui"
+              }
+              icon={BellRing}
+              variant="info"
+            />
+            <StatsCard
+              title="DAO concernés"
+              value={stats.uniqueDaoCount}
+              description={daoDescription}
+              icon={FolderKanban}
+              variant="active"
+            />
+            <StatsCard
+              title="Tâches"
+              value={stats.taskCount}
+              description={taskDescription}
+              icon={ListChecks}
+              variant={taskCardVariant}
+            />
+          </div>
+        </section>
+
+        <Card className="shadow-sm border border-border/60 bg-white/80 backdrop-blur rounded-2xl">
           <CardHeader>
             <CardTitle>Historique des modifications</CardTitle>
             <CardDescription>
