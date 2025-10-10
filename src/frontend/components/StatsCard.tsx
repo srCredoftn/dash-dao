@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
-type StatsVariant = "total" | "active" | "completed" | "urgent" | "default";
+type StatsVariant = "total" | "active" | "completed" | "urgent" | "info" | "default";
 
 interface StatsCardProps {
   title: string;
@@ -57,6 +57,13 @@ const VARIANT_STYLES: Record<
     valueClass: "text-red-800",
     descriptionClass: "text-red-600/80 text-xs",
     iconClass: "h-7 w-7 bg-red-500 text-white rounded-lg p-1.5 shadow-sm",
+  },
+  info: {
+    cardClass: "bg-blue-50/80 border-blue-200/60 backdrop-blur-sm",
+    titleClass: "text-blue-700 font-medium text-sm",
+    valueClass: "text-blue-800",
+    descriptionClass: "text-blue-600/80 text-xs",
+    iconClass: "h-7 w-7 bg-blue-500 text-white rounded-lg p-1.5 shadow-sm",
   },
   default: {
     cardClass: "",

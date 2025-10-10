@@ -24,7 +24,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, History as HistoryIcon } from "lucide-react";
+import { StatsCard } from "@/components/StatsCard";
+import { cn } from "@/lib/utils";
+import { GRID_CLASSES } from "@/types/responsive";
+import {
+  ArrowLeft,
+  BellRing,
+  FolderKanban,
+  History as HistoryIcon,
+  ListChecks,
+  PieChart,
+} from "lucide-react";
 
 const TIMEFRAME_OPTIONS = [
   { value: "all", label: "Tout" },
@@ -306,14 +316,53 @@ export default function History() {
       isWithinTimeframe(item.createdAt, "day"),
     ).length;
 
-    return { total, byType, recent };
+    const uniqueDaoIds = new Set<string>();
+    notifications.forEach((item) => {
+      const { daoId, daoNumber } = getDaoMeta(item);
+      if (daoId) {
+        uniqueDaoIds.add(String(daoId));
+      } else if (daoNumber && daoNumber !== "—") {
+        uniqueDaoIds.add(String(daoNumber));
+      }
+    });
+
+    const daoActivity =
+      (byType["dao_created"] || 0) +
+      (byType["dao_updated"] || 0) +
+      (byType["dao_deleted"] || 0);
+
+    const taskCount = byType["task_notification"] || 0;
+
+    return {
+      total,
+      byType,
+      recent,
+      uniqueDaoCount: uniqueDaoIds.size || daoActivity,
+      daoActivity,
+      taskCount,
+    };
   }, [notifications]);
 
   const navigate = useNavigate();
+  const taskCardVariant = stats.taskCount > 0 ? "urgent" : "completed";
+  const todayDescription =
+    stats.recent === 0
+      ? "Aucune notification aujourd'hui"
+      : stats.recent > 1
+        ? "Notifications aujourd'hui"
+        : "Notification aujourd'hui";
+  const daoDescription =
+    stats.daoActivity > 0
+      ? `${stats.daoActivity} notification${stats.daoActivity > 1 ? "s" : ""} liée${stats.daoActivity > 1 ? "s" : ""}`
+      : "Aucune notification liée";
+  const taskDescription =
+    stats.taskCount > 0
+      ? `${stats.taskCount} notification${stats.taskCount > 1 ? "s" : ""} de tâche`
+      : "Aucune alerte tâche";
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-white border-b">
+      <header className="bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="block lg:hidden">
             <div className="flex items-center space-x-3 mb-3">
@@ -360,7 +409,40 @@ export default function History() {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 py-6 space-y-6">
-        <Card>
+        <section>
+          <div className={cn(GRID_CLASSES.stats, "gap-3 sm:gap-4")}>
+            <StatsCard
+              title="Total"
+              value={stats.total}
+              description="Notifications enregistrées"
+              icon={PieChart}
+              variant="total"
+            />
+            <StatsCard
+              title="Aujourd'hui"
+              value={stats.recent}
+              description={todayDescription}
+              icon={BellRing}
+              variant="info"
+            />
+            <StatsCard
+              title="DAO concernés"
+              value={stats.uniqueDaoCount}
+              description={daoDescription}
+              icon={FolderKanban}
+              variant="active"
+            />
+            <StatsCard
+              title="Tâches"
+              value={stats.taskCount}
+              description={taskDescription}
+              icon={ListChecks}
+              variant={taskCardVariant}
+            />
+          </div>
+        </section>
+
+        <Card className="shadow-sm border border-border/60 bg-white/80 backdrop-blur rounded-2xl">
           <CardHeader>
             <CardTitle>Historique des modifications</CardTitle>
             <CardDescription>
@@ -368,105 +450,79 @@ export default function History() {
               par période, type ou numéro de DAO.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Total
-                </div>
-                <div className="text-2xl font-semibold">{stats.total}</div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Notifications aujourd'hui
-                </div>
-                <div className="text-2xl font-semibold">{stats.recent}</div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  DAO
-                </div>
-                <div className="text-2xl font-semibold">
-                  {(stats.byType["dao_created"] || 0) +
-                    (stats.byType["dao_updated"] || 0) +
-                    (stats.byType["dao_deleted"] || 0)}
-                </div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Tâches
-                </div>
-                <div className="text-2xl font-semibold">
-                  {stats.byType["task_notification"] || 0}
-                </div>
-              </div>
-            </div>
+          <CardContent className="space-y-5">
+            <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-white to-muted/10 p-4 sm:p-6 shadow-inner space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Select
+                  value={timeframe}
+                  onValueChange={(value: Timeframe) => setTimeframe(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Période" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMEFRAME_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Select
-                value={timeframe}
-                onValueChange={(value: Timeframe) => setTimeframe(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Période" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEFRAME_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select
+                  value={typeFilter}
+                  onValueChange={(value: TypeFilter) => setTypeFilter(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Type de notification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select
-                value={typeFilter}
-                onValueChange={(value: TypeFilter) => setTypeFilter(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Type de notification" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(TYPE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select
+                  value={sort}
+                  onValueChange={(value: SortOption) => setSort(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Tri" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(SORT_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select
-                value={sort}
-                onValueChange={(value: SortOption) => setSort(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tri" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(SORT_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Rechercher (DAO-XXXX-XXX, nom, mot-clé...)"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div>
-                {filtered.length} notification{filtered.length > 1 ? "s" : ""}{" "}
-                affichée
-                {filtered.length > 1 ? "s" : ""}
+                <Input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Rechercher (DAO-XXXX-XXX, nom, mot-clé...)"
+                  className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0"
+                />
               </div>
-              <Button variant="ghost" size="sm" onClick={() => refresh()}>
-                Actualiser
-              </Button>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
+                <div>
+                  {filtered.length} notification{filtered.length > 1 ? "s" : ""} affichée
+                  {filtered.length > 1 ? "s" : ""}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refresh()}
+                  className="self-start sm:self-auto"
+                >
+                  Actualiser
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -486,8 +542,11 @@ export default function History() {
               const lines = splitLines(notification.message);
 
               return (
-                <Card key={notification.id} className="border-border/80">
-                  <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <Card
+                  key={notification.id}
+                  className="rounded-2xl border border-border/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg overflow-hidden"
+                >
+                  <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-muted/20 px-5 py-4 border-b border-border/40">
                     <div>
                       <CardTitle className="text-base font-semibold">
                         {notification.title}
@@ -509,7 +568,7 @@ export default function History() {
                       {daoId && <Badge variant="outline">ID: {daoId}</Badge>}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 px-5 py-5">
                     {notification.type === "dao_updated" ? (
                       (() => {
                         const s = parseDaoUpdated(
