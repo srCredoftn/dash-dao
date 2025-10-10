@@ -24,9 +24,7 @@ export default function AdminHealth() {
     if (!isAdmin()) return;
     (async () => {
       try {
-        const res = await secureFetch("/api/system/mail/diagnostics", {
-          method: "GET",
-        });
+        const res = await secureFetch.get("/api/system/mail/diagnostics");
         const json = await res.json();
         setDiag(json);
       } catch (e) {
@@ -65,15 +63,15 @@ export default function AdminHealth() {
                     size="sm"
                     onClick={async () => {
                       try {
-                        const res = await secureFetch(
+                        const res = await secureFetch.post(
                           "/api/notifications/test-email",
-                          { method: "POST" },
                         );
                         if (res.ok) {
                           setDiag(null);
-                          const d = await (
-                            await secureFetch("/api/system/mail/diagnostics")
-                          ).json();
+                          const diagnosticsResponse = await secureFetch.get(
+                            "/api/system/mail/diagnostics",
+                          );
+                          const d = await diagnosticsResponse.json();
                           setDiag(d);
                           // toast success minimal via alert-style
                           alert(
