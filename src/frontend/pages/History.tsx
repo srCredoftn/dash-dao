@@ -316,7 +316,31 @@ export default function History() {
       isWithinTimeframe(item.createdAt, "day"),
     ).length;
 
-    return { total, byType, recent };
+    const uniqueDaoIds = new Set<string>();
+    notifications.forEach((item) => {
+      const { daoId, daoNumber } = getDaoMeta(item);
+      if (daoId) {
+        uniqueDaoIds.add(String(daoId));
+      } else if (daoNumber && daoNumber !== "—") {
+        uniqueDaoIds.add(String(daoNumber));
+      }
+    });
+
+    const daoActivity =
+      (byType["dao_created"] || 0) +
+      (byType["dao_updated"] || 0) +
+      (byType["dao_deleted"] || 0);
+
+    const taskCount = byType["task_notification"] || 0;
+
+    return {
+      total,
+      byType,
+      recent,
+      uniqueDaoCount: uniqueDaoIds.size || daoActivity,
+      daoActivity,
+      taskCount,
+    };
   }, [notifications]);
 
   const navigate = useNavigate();
