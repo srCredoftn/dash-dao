@@ -345,13 +345,19 @@ export default function History() {
 
   const navigate = useNavigate();
   const taskCardVariant = stats.taskCount > 0 ? "urgent" : "completed";
+  const todayDescription =
+    stats.recent === 0
+      ? "Aucune notification aujourd'hui"
+      : stats.recent > 1
+        ? "Notifications aujourd'hui"
+        : "Notification aujourd'hui";
   const daoDescription =
     stats.daoActivity > 0
-      ? `${stats.daoActivity} notification${stats.daoActivity > 1 ? "s" : ""} liées`
+      ? `${stats.daoActivity} notification${stats.daoActivity > 1 ? "s" : ""} liée${stats.daoActivity > 1 ? "s" : ""}`
       : "Aucune notification liée";
   const taskDescription =
     stats.taskCount > 0
-      ? `${stats.taskCount} notification${stats.taskCount > 1 ? "s" : ""} tâche`
+      ? `${stats.taskCount} notification${stats.taskCount > 1 ? "s" : ""} de tâche`
       : "Aucune alerte tâche";
 
   return (
