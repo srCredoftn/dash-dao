@@ -167,7 +167,7 @@ function parseDaoUpdated(message: string, data: any) {
   // First block: metadata (Numéro de liste, Autorité, Date...)
   while (i < work.length) {
     const ln = work[i];
-    if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
+    if (ln === "Équipe :" || ln === "Tâches modifi��es :") break;
     // Stop metadata when we hit first pair-specific change like "… antérieur :"
     if (/antérieu|modifié/i.test(ln)) break;
     result.summary.push(ln);
@@ -448,105 +448,79 @@ export default function History() {
               par période, type ou numéro de DAO.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Total
-                </div>
-                <div className="text-2xl font-semibold">{stats.total}</div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Notifications aujourd'hui
-                </div>
-                <div className="text-2xl font-semibold">{stats.recent}</div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  DAO
-                </div>
-                <div className="text-2xl font-semibold">
-                  {(stats.byType["dao_created"] || 0) +
-                    (stats.byType["dao_updated"] || 0) +
-                    (stats.byType["dao_deleted"] || 0)}
-                </div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-4">
-                <div className="text-xs uppercase text-muted-foreground">
-                  Tâches
-                </div>
-                <div className="text-2xl font-semibold">
-                  {stats.byType["task_notification"] || 0}
-                </div>
-              </div>
-            </div>
+          <CardContent className="space-y-5">
+            <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-white to-muted/10 p-4 sm:p-6 shadow-inner space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Select
+                  value={timeframe}
+                  onValueChange={(value: Timeframe) => setTimeframe(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Période" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMEFRAME_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Select
-                value={timeframe}
-                onValueChange={(value: Timeframe) => setTimeframe(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Période" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEFRAME_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select
+                  value={typeFilter}
+                  onValueChange={(value: TypeFilter) => setTypeFilter(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Type de notification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select
-                value={typeFilter}
-                onValueChange={(value: TypeFilter) => setTypeFilter(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Type de notification" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(TYPE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select
+                  value={sort}
+                  onValueChange={(value: SortOption) => setSort(value)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0">
+                    <SelectValue placeholder="Tri" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(SORT_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select
-                value={sort}
-                onValueChange={(value: SortOption) => setSort(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tri" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(SORT_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Rechercher (DAO-XXXX-XXX, nom, mot-clé...)"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div>
-                {filtered.length} notification{filtered.length > 1 ? "s" : ""}{" "}
-                affichée
-                {filtered.length > 1 ? "s" : ""}
+                <Input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Rechercher (DAO-XXXX-XXX, nom, mot-clé...)"
+                  className="h-11 rounded-xl border-border/60 bg-white/90 shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0"
+                />
               </div>
-              <Button variant="ghost" size="sm" onClick={() => refresh()}>
-                Actualiser
-              </Button>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
+                <div>
+                  {filtered.length} notification{filtered.length > 1 ? "s" : ""} affichée
+                  {filtered.length > 1 ? "s" : ""}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refresh()}
+                  className="self-start sm:self-auto"
+                >
+                  Actualiser
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
