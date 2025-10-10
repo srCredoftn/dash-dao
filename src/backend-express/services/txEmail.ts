@@ -228,7 +228,9 @@ function isTemporarySmtpError(code: string, message: string): boolean {
   // Treat common quota/rate scenarios as temporary to trigger fallback/backoff
   if (
     normalizedCode === "554" ||
-    /quota|limit on the number of allowed outgoing messages|too many messages|rate limit|exceeded/i.test(msg)
+    /quota|limit on the number of allowed outgoing messages|too many messages|rate limit|exceeded/i.test(
+      msg,
+    )
   ) {
     return true;
   }
@@ -954,7 +956,12 @@ export const Templates = {
       ].join("\n");
       return { subject, body };
     },
-    leadChanged(ctx: { dao: Dao; prevLeader?: { name: string; email?: string } | null; newLeader?: { name: string; email?: string } | null; members?: Array<{ name: string; email?: string }> }): {
+    leadChanged(ctx: {
+      dao: Dao;
+      prevLeader?: { name: string; email?: string } | null;
+      newLeader?: { name: string; email?: string } | null;
+      members?: Array<{ name: string; email?: string }>;
+    }): {
       toNewLeader: { subject: string; body: string };
       toOldLeader: { subject: string; body: string };
       toMembers: { subject: string; body: string };

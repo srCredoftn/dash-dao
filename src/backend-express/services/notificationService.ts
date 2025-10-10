@@ -240,8 +240,10 @@ class InMemoryNotificationService {
         // Prioritize admin + team first to ensure critical recipients get emails before quota issues
         const prioritized: string[] = [];
         if (admin && isValidEmail(admin)) prioritized.push(admin);
-        for (const e of teamEmails) if (!prioritized.includes(e)) prioritized.push(e);
-        for (const e of userEmails) if (!prioritized.includes(e)) prioritized.push(e);
+        for (const e of teamEmails)
+          if (!prioritized.includes(e)) prioritized.push(e);
+        for (const e of userEmails)
+          if (!prioritized.includes(e)) prioritized.push(e);
         if (prioritized.length === 0) {
           logger.info(
             "Miroir email : aucun destinataire e-mail valide (skip)",
