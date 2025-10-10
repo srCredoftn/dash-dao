@@ -24,7 +24,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, History as HistoryIcon } from "lucide-react";
+import { StatsCard } from "@/components/StatsCard";
+import { cn } from "@/lib/utils";
+import { GRID_CLASSES } from "@/types/responsive";
+import {
+  ArrowLeft,
+  BellRing,
+  FolderKanban,
+  History as HistoryIcon,
+  ListChecks,
+  PieChart,
+} from "lucide-react";
 
 const TIMEFRAME_OPTIONS = [
   { value: "all", label: "Tout" },
