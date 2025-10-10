@@ -321,7 +321,7 @@ export default function History() {
       const { daoId, daoNumber } = getDaoMeta(item);
       if (daoId) {
         uniqueDaoIds.add(String(daoId));
-      } else if (daoNumber && daoNumber !== "��") {
+      } else if (daoNumber && daoNumber !== "—") {
         uniqueDaoIds.add(String(daoNumber));
       }
     });
@@ -544,7 +544,7 @@ export default function History() {
                   key={notification.id}
                   className="rounded-2xl border border-border/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg overflow-hidden"
                 >
-                  <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-muted/20 px-5 py-4 border-b border-border/40">
                     <div>
                       <CardTitle className="text-base font-semibold">
                         {notification.title}
