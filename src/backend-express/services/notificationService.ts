@@ -237,10 +237,12 @@ class InMemoryNotificationService {
           .map((u: any) => normalizeEmail(u.email))
           .filter((e: any): e is string => Boolean(e) && isValidEmail(e));
         const admin = normalizeEmail(process.env.ADMIN_EMAIL || "");
-        const combined = new Set<string>([...userEmails, ...teamEmails]);
-        if (admin && isValidEmail(admin)) combined.add(admin);
-        const recipients = Array.from(combined);
-        if (recipients.length === 0) {
+        // Prioritize admin + team first to ensure critical recipients get emails before quota issues
+        const prioritized: string[] = [];
+        if (admin && isValidEmail(admin)) prioritized.push(admin);
+        for (const e of teamEmails) if (!prioritized.includes(e)) prioritized.push(e);
+        for (const e of userEmails) if (!prioritized.includes(e)) prioritized.push(e);
+        if (prioritized.length === 0) {
           logger.info(
             "Miroir email : aucun destinataire e-mail valide (skip)",
             "MAIL",
@@ -249,7 +251,7 @@ class InMemoryNotificationService {
           return;
         }
         await retryAsync(
-          () => sendEmail(recipients, subject, body, undefined),
+          () => sendEmail(prioritized, subject, body, undefined),
           3,
         );
         logger.info(
@@ -257,7 +259,7 @@ class InMemoryNotificationService {
           "MAIL",
           {
             type: item.type,
-            count: recipients.length,
+            count: prioritized.length,
           },
         );
         return;
@@ -269,8 +271,10 @@ class InMemoryNotificationService {
       );
 
       const teamEmails = await collectTeamEmails();
-      const merged = Array.from(new Set([...(emails || []), ...teamEmails]));
-      const { valid } = partitionEmails(merged);
+      const ordered: string[] = [];
+      for (const e of teamEmails) if (!ordered.includes(e)) ordered.push(e);
+      for (const e of emails || []) if (!ordered.includes(e)) ordered.push(e);
+      const { valid } = partitionEmails(ordered);
 
       if (invalid.length > 0) {
         logger.warn("Miroir email : adresses invalides ignorées", "MAIL", {
