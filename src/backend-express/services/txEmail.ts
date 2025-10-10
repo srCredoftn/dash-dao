@@ -945,6 +945,51 @@ export const Templates = {
       ].join("\n");
       return { subject, body };
     },
+    leadChanged(ctx: { dao: Dao; prevLeader?: { name: string; email?: string } | null; newLeader?: { name: string; email?: string } | null; members?: Array<{ name: string; email?: string }> }): {
+      toNewLeader: { subject: string; body: string };
+      toOldLeader: { subject: string; body: string };
+      toMembers: { subject: string; body: string };
+    } {
+      const { dao, prevLeader, newLeader, members = [] } = ctx;
+      const base = `DAO : ${dao.objetDossier} (${dao.reference})\nAutorité contractante : ${dao.autoriteContractante}\nDate de dépôt : ${frDate(dao.dateDepot)}`;
+      const toNewLeader = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Vous êtes désormais chef d’équipe.`,
+          prevLeader?.name ? `Précédent chef : ${prevLeader.name}` : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      const toOldLeader = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Vous n’êtes plus chef d’équipe.`,
+          newLeader?.name ? `Nouveau chef : ${newLeader.name}` : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      const toMembers = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Nouveau chef d’équipe : ${newLeader?.name || "—"}`,
+          prevLeader?.name ? `Précédent chef : ${prevLeader.name}` : undefined,
+          members.length
+            ? `Membres: ${members.map((m) => m.name).join(", ")}`
+            : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      return { toNewLeader, toOldLeader, toMembers };
+    },
     updated(ctx: {
       before: Dao;
       after: Dao;
