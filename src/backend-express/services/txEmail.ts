@@ -200,8 +200,11 @@ function buildEmailHtml(subject: string, body: string): string {
 }
 
 function isDryRunEnabled(): boolean {
-  if ((process.env.NODE_ENV || "").toLowerCase() === "test") return true;
-  return String(process.env.SMTP_DRY_RUN || "false").toLowerCase() === "true";
+  const configuredValue = process.env.SMTP_DRY_RUN;
+  if (configuredValue !== undefined && configuredValue !== null) {
+    return String(configuredValue).toLowerCase() === "true";
+  }
+  return (process.env.NODE_ENV || "").toLowerCase() === "test";
 }
 
 function isTemporarySmtpError(code: string, message: string): boolean {
