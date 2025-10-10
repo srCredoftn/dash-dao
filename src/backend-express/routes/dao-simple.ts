@@ -537,11 +537,40 @@ router.put(
             (res as any).teamChanged = true;
             teamChangeSummary = changed;
 
+            // Envoi direct dédié si le chef change (robuste: allSettled, n'interrompt pas les autres mails)
+            try {
+              const prevLeader = (before?.equipe || []).find((m) => m.role === "chef_equipe") || null;
+              const newLeader = (updated.equipe || []).find((m) => m.role === "chef_equipe") || null;
+              if (!prevLeader || !newLeader || prevLeader.id === newLeader.id) {
+                // rien à faire si pas de changement effectif
+              } else {
+                const members = (updated.equipe || []).filter((m) => m.id !== newLeader.id && m.id !== prevLeader.id);
+                const t = MailTemplates.dao.leadChanged({
+                  dao: updated,
+                  prevLeader: { name: prevLeader.name, email: (prevLeader as any).email },
+                  newLeader: { name: newLeader.name, email: (newLeader as any).email },
+                  members: members.map((m) => ({ name: m.name, email: (m as any).email })),
+                });
+                const memberEmails = members.map((m) => (m as any).email).filter(Boolean);
+                await Promise.allSettled([
+                  newLeader && (newLeader as any).email
+                    ? sendEmail((newLeader as any).email, t.toNewLeader.subject, t.toNewLeader.body, "TEAM_LEAD_CHANGED")
+                    : Promise.resolve(),
+                  prevLeader && (prevLeader as any).email && prevLeader.id !== newLeader.id
+                    ? sendEmail((prevLeader as any).email, t.toOldLeader.subject, t.toOldLeader.body, "TEAM_LEAD_CHANGED")
+                    : Promise.resolve(),
+                  memberEmails.length > 0
+                    ? sendEmail(memberEmails as any, t.toMembers.subject, t.toMembers.body, "TEAM_LEAD_CHANGED")
+                    : Promise.resolve(),
+                ]);
+              }
+            } catch (_) {}
+
             // Suppression de l'envoi intermédiaire pour éviter le doublon avec "Mise à jour d’un DAO".
             // Les changements d'équipe sont déjà intégrés dans la notification globale suivante via teamChangeSummary.
             // Aucun broadcast ici.
 
-            // Email affected members when emails exist (handled elsewhere if needed)
+            // Email affected members when emails exist (handled ailleurs si nécessaire)
           }
         }
 
