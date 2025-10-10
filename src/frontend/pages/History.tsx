@@ -566,7 +566,7 @@ export default function History() {
                       {daoId && <Badge variant="outline">ID: {daoId}</Badge>}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 px-5 py-5">
                     {notification.type === "dao_updated" ? (
                       (() => {
                         const s = parseDaoUpdated(
