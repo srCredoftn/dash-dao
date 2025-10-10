@@ -42,6 +42,7 @@ export type MailType =
   | "TASK_ASSIGNED"
   | "TASK_REASSIGNED"
   | "TASK_COMMENTED"
+  | "TEAM_LEAD_CHANGED"
   | "AUTH_PASSWORD_RESET"
   | "AUTH_PASSWORD_CHANGED"
   | "SYSTEM_TEST";
@@ -205,7 +206,8 @@ function isDryRunEnabled(): boolean {
 
 function isTemporarySmtpError(code: string, message: string): boolean {
   const normalizedCode = (code || "").toString().trim().toUpperCase();
-  if (!normalizedCode) return /timeout|temporar|retry/i.test(message || "");
+  const msg = String(message || "");
+  if (!normalizedCode) return /timeout|temporar|retry/i.test(msg);
   const temporaryCodes = new Set([
     "ETIMEDOUT",
     "ESOCKETTIMEDOUT",
@@ -223,7 +225,16 @@ function isTemporarySmtpError(code: string, message: string): boolean {
   if (temporaryCodes.has(normalizedCode)) return true;
   if (/^4\d\d$/.test(normalizedCode)) return true;
   if (normalizedCode === "421") return true;
-  return /temporary|timeout|try again|later|rate limit/i.test(message || "");
+  // Treat common quota/rate scenarios as temporary to trigger fallback/backoff
+  if (
+    normalizedCode === "554" ||
+    /quota|limit on the number of allowed outgoing messages|too many messages|rate limit|exceeded/i.test(
+      msg,
+    )
+  ) {
+    return true;
+  }
+  return /temporary|timeout|try again|later|rate limit/i.test(msg);
 }
 
 async function persistQueueSnapshot() {
@@ -944,6 +955,56 @@ export const Templates = {
         `Membres : ${team.membres}`,
       ].join("\n");
       return { subject, body };
+    },
+    leadChanged(ctx: {
+      dao: Dao;
+      prevLeader?: { name: string; email?: string } | null;
+      newLeader?: { name: string; email?: string } | null;
+      members?: Array<{ name: string; email?: string }>;
+    }): {
+      toNewLeader: { subject: string; body: string };
+      toOldLeader: { subject: string; body: string };
+      toMembers: { subject: string; body: string };
+    } {
+      const { dao, prevLeader, newLeader, members = [] } = ctx;
+      const base = `DAO : ${dao.objetDossier} (${dao.reference})\nAutorité contractante : ${dao.autoriteContractante}\nDate de dépôt : ${frDate(dao.dateDepot)}`;
+      const toNewLeader = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Vous êtes désormais chef d’équipe.`,
+          prevLeader?.name ? `Précédent chef : ${prevLeader.name}` : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      const toOldLeader = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Vous n’êtes plus chef d’équipe.`,
+          newLeader?.name ? `Nouveau chef : ${newLeader.name}` : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      const toMembers = {
+        subject: `Changement de chef d’équipe — ${dao.objetDossier}`,
+        body: [
+          base,
+          "",
+          `Nouveau chef d’équipe : ${newLeader?.name || "—"}`,
+          prevLeader?.name ? `Précédent chef : ${prevLeader.name}` : undefined,
+          members.length
+            ? `Membres: ${members.map((m) => m.name).join(", ")}`
+            : undefined,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      };
+      return { toNewLeader, toOldLeader, toMembers };
     },
     updated(ctx: {
       before: Dao;
