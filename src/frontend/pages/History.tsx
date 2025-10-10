@@ -421,11 +421,7 @@ export default function History() {
             <StatsCard
               title="Aujourd'hui"
               value={stats.recent}
-              description={
-                stats.recent > 1
-                  ? "Notifications aujourd'hui"
-                  : "Notification aujourd'hui"
-              }
+              description={todayDescription}
               icon={BellRing}
               variant="info"
             />
