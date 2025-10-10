@@ -37,6 +37,7 @@ import {
   tplDaoDeleted,
   tplTaskNotification,
 } from "../services/notificationTemplates";
+import { Templates as MailTemplates, sendEmail } from "../services/txEmail";
 import { daoStorage } from "../data/daoStorage";
 import { CommentService } from "../services/commentService";
 
