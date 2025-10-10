@@ -347,7 +347,7 @@ export default function History() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-white border-b">
+      <header className="bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="block lg:hidden">
             <div className="flex items-center space-x-3 mb-3">
