@@ -39,6 +39,7 @@ const DaoSchema = new Schema<Dao>(
     reference: { type: String, required: true },
     autoriteContractante: { type: String, required: true },
     dateDepot: { type: String, required: true },
+    initialDateDepot: { type: String },
     equipe: [TeamMemberSchema],
     tasks: [DaoTaskSchema],
     createdAt: { type: String, required: true },
