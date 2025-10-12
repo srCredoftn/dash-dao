@@ -1180,7 +1180,7 @@ export default function DaoDetail() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="space-y-2">
+              <div className="space-y-2 order-1">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
                     Référence
@@ -1222,7 +1222,7 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 order-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
                     Date de dépôt
@@ -1331,7 +1331,7 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 order-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
                     Autorité contractante
@@ -1416,7 +1416,7 @@ export default function DaoDetail() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Chef d'équipe</Label>
-                {isAdmin() && (
+                {false && isAdmin() && (
                   <TeamEditDialog
                     currentTeam={dao.equipe}
                     onTeamUpdate={handleTeamUpdate}
