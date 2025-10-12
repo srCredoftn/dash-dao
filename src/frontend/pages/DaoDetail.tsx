@@ -20,6 +20,7 @@ import {
   Download,
   Edit3,
   CheckCircle,
+  MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,8 +31,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import EditDaoDialog from "@/components/EditDaoDialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { devLog } from "@/utils/devLogger";
@@ -83,6 +90,7 @@ export default function DaoDetail() {
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [tempDateDepot, setTempDateDepot] = useState("");
   const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
@@ -264,6 +272,32 @@ export default function DaoDetail() {
             ? { ...task, ...updates, lastUpdatedAt: new Date().toISOString() }
             : task,
         ),
+      };
+    });
+    markDirty();
+  };
+
+  const handleBulkDaoEditSave = (updates: {
+    objetDossier: string;
+    reference: string;
+    autoriteContractante: string;
+    dateDepot: string;
+    equipe: TeamMember[];
+  }) => {
+    if (!dao) return;
+    setDao((prev) => {
+      if (!prev) return prev;
+      const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
+      if (dateChanged) {
+        setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
+      }
+      return {
+        ...prev,
+        objetDossier: updates.objetDossier,
+        reference: updates.reference,
+        autoriteContractante: updates.autoriteContractante,
+        dateDepot: updates.dateDepot || prev.dateDepot,
+        equipe: updates.equipe,
       };
     });
     markDirty();
@@ -1114,7 +1148,7 @@ export default function DaoDetail() {
                     <CardTitle className="text-lg md:text-xl">
                       {dao.objetDossier}
                     </CardTitle>
-                    {isAdmin() && (
+                    {false && isAdmin() && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1128,6 +1162,20 @@ export default function DaoDetail() {
                   </div>
                 )}
               </div>
+              {isAdmin() && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Ouvrir le menu DAO">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                      Modifier DAO
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -1137,7 +1185,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Référence
                   </Label>
-                  {!isEditingReference && isAdmin() && (
+                  {false && !isEditingReference && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1179,7 +1227,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Date de dépôt
                   </Label>
-                  {!isEditingDate && isAdmin() && (
+                  {false && !isEditingDate && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1288,7 +1336,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Autorité contractante
                   </Label>
-                  {!isEditingAuthority && isAdmin() && (
+                  {false && !isEditingAuthority && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1401,6 +1449,13 @@ export default function DaoDetail() {
             </div>
           </CardContent>
         </Card>
+
+        <EditDaoDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          dao={dao}
+          onSave={handleBulkDaoEditSave}
+        />
 
         {/* Détail des tâches */}
         <Card>
