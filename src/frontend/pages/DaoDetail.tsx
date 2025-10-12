@@ -1148,6 +1148,17 @@ export default function DaoDetail() {
                     <CardTitle className="text-lg md:text-xl">
                       {dao.objetDossier}
                     </CardTitle>
+                    {false && isAdmin() && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={handleStartEditingObjet}
+                        aria-label="Modifier l'objet du dossier"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
