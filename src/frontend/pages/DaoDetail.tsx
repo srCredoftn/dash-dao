@@ -117,7 +117,7 @@ export default function DaoDetail() {
         setDao(fetchedDao);
         markSaved();
 
-        // D��terminer s'il s'agit du dernier DAO cr��é (fonctionnalité admin)
+        // Déterminer s'il s'agit du dernier DAO cr��é (fonctionnalité admin)
         try {
           const next = await apiService.getNextDaoNumber();
           const m = next.match(/^DAO-(\d{4})-(\d{3})$/i);
@@ -273,6 +273,32 @@ export default function DaoDetail() {
             ? { ...task, ...updates, lastUpdatedAt: new Date().toISOString() }
             : task,
         ),
+      };
+    });
+    markDirty();
+  };
+
+  const handleBulkDaoEditSave = (updates: {
+    objetDossier: string;
+    reference: string;
+    autoriteContractante: string;
+    dateDepot: string;
+    equipe: TeamMember[];
+  }) => {
+    if (!dao) return;
+    setDao((prev) => {
+      if (!prev) return prev;
+      const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
+      if (dateChanged) {
+        setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
+      }
+      return {
+        ...prev,
+        objetDossier: updates.objetDossier,
+        reference: updates.reference,
+        autoriteContractante: updates.autoriteContractante,
+        dateDepot: updates.dateDepot || prev.dateDepot,
+        equipe: updates.equipe,
       };
     });
     markDirty();
