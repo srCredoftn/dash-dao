@@ -1416,7 +1416,7 @@ export default function DaoDetail() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Chef d'équipe</Label>
-                {isAdmin() && (
+                {false && isAdmin() && (
                   <TeamEditDialog
                     currentTeam={dao.equipe}
                     onTeamUpdate={handleTeamUpdate}
