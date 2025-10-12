@@ -844,6 +844,41 @@ export default function DaoDetail() {
     setIsEditingObjet(false);
   };
 
+  const handleStartEditingDate = () => {
+    if (!dao) return;
+    setTempDateDepot(toDateInputValue(dao.dateDepot));
+    setIsEditingDate(true);
+  };
+
+  const handleCancelEditingDate = () => {
+    setIsEditingDate(false);
+    setTempDateDepot("");
+  };
+
+  const handleSaveDate = () => {
+    if (!dao) return;
+    const nextIso = toIsoFromInputValue(tempDateDepot);
+    if (!nextIso) {
+      toast({
+        title: "Date invalide",
+        description: "Veuillez sélectionner une date de dépôt valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (nextIso === dao.dateDepot) {
+      setIsEditingDate(false);
+      setTempDateDepot("");
+      return;
+    }
+
+    setInitialDateDepot((prev) => (prev !== null ? prev : dao.dateDepot));
+    setDao((prev) => (prev ? { ...prev, dateDepot: nextIso } : prev));
+    markDirty();
+    setIsEditingDate(false);
+    setTempDateDepot("");
+  };
+
   // Utilitaires d'affichage
   const toDateInputValue = (value: string) => {
     if (!value) return "";
