@@ -1271,7 +1271,7 @@ export default function DaoDetail() {
 
                 {isDateUpdated && (
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <Label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Nouvelle date de dépôt
                     </Label>
                     <span
