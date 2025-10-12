@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from "react";
 /**
  * Détail d'un DAO
- * Rôle: afficher et éditer les informations d'un DAO, ses tâches, l'équipe et exporter des rapports (PDF/CSV).
+ * R��le: afficher et éditer les informations d'un DAO, ses tâches, l'équipe et exporter des rapports (PDF/CSV).
  * Perf: mises à jour optimistes, debounce des sauvegardes, import dynamique de jsPDF.
  */
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -91,6 +91,7 @@ export default function DaoDetail() {
   const [tempDateDepot, setTempDateDepot] = useState("");
   const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [hasDateUpdate, setHasDateUpdate] = useState(false);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
@@ -164,6 +165,7 @@ export default function DaoDetail() {
 
   useEffect(() => {
     setInitialDateDepot(null);
+    setHasDateUpdate(false);
     setIsEditingDate(false);
     setTempDateDepot("");
   }, [id]);
@@ -290,6 +292,7 @@ export default function DaoDetail() {
       const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
       if (dateChanged) {
         setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
+        setHasDateUpdate(true);
       }
       return {
         ...prev,
@@ -907,6 +910,7 @@ export default function DaoDetail() {
     }
 
     setInitialDateDepot((prev) => (prev !== null ? prev : dao.dateDepot));
+    setHasDateUpdate(true);
     setDao((prev) => (prev ? { ...prev, dateDepot: nextIso } : prev));
     markDirty();
     setIsEditingDate(false);
@@ -978,7 +982,7 @@ export default function DaoDetail() {
 
   const currentDateInfo = formatDate(dao.dateDepot);
   const isDateUpdated =
-    initialDateDepot !== null && initialDateDepot !== dao.dateDepot;
+    (initialDateDepot !== null && initialDateDepot !== dao.dateDepot) || hasDateUpdate;
   const previousDateInfo =
     isDateUpdated && initialDateDepot ? formatDate(initialDateDepot) : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
@@ -1007,8 +1011,12 @@ export default function DaoDetail() {
         dateDepot: dao.dateDepot,
         equipe: dao.equipe,
       } as Partial<Dao>;
-      const updated = await apiService.updateDao(dao.id, payload);
+      const updated = await apiService.updateDao(dao.id, payload, true);
       setDao(updated);
+      // Si la date retournée diffère de l'initiale, s'assurer que le bandeau reste affiché
+      if (initialDateDepot !== null && updated.dateDepot !== initialDateDepot) {
+        setHasDateUpdate(true);
+      }
       markSaved();
       setStagedComments({});
       toast({
