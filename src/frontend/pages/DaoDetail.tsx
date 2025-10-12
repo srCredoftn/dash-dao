@@ -161,10 +161,10 @@ export default function DaoDetail() {
   }, [id]);
 
   useEffect(() => {
-    if (dao && !initialDateDepot) {
+    if (dao && id && dao.id === id && !initialDateDepot) {
       setInitialDateDepot(dao.dateDepot);
     }
-  }, [dao, initialDateDepot]);
+  }, [dao, id, initialDateDepot]);
 
   // Écrans d'état (chargement / erreur / introuvable)
   if (loading) {
@@ -207,7 +207,7 @@ export default function DaoDetail() {
   /**
    * Gestion des mises à jour de tâche (progress, commentaire, applicabilité, assignations)
    * - Mises à jour optimistes locales
-   * - Persistance via services d��diés
+   * - Persistance via services dédiés
    */
   const handleTaskProgressChange = (
     taskId: number,
