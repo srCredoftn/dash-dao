@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from "react";
 /**
  * Détail d'un DAO
- * Rôle: afficher et éditer les informations d'un DAO, ses tâches, l'équipe et exporter des rapports (PDF/CSV).
+ * R��le: afficher et éditer les informations d'un DAO, ses tâches, l'équipe et exporter des rapports (PDF/CSV).
  * Perf: mises à jour optimistes, debounce des sauvegardes, import dynamique de jsPDF.
  */
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -91,6 +91,7 @@ export default function DaoDetail() {
   const [tempDateDepot, setTempDateDepot] = useState("");
   const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [hasDateUpdate, setHasDateUpdate] = useState(false);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
@@ -164,6 +165,7 @@ export default function DaoDetail() {
 
   useEffect(() => {
     setInitialDateDepot(null);
+    setHasDateUpdate(false);
     setIsEditingDate(false);
     setTempDateDepot("");
   }, [id]);
@@ -290,6 +292,7 @@ export default function DaoDetail() {
       const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
       if (dateChanged) {
         setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
+        setHasDateUpdate(true);
       }
       return {
         ...prev,
@@ -907,6 +910,7 @@ export default function DaoDetail() {
     }
 
     setInitialDateDepot((prev) => (prev !== null ? prev : dao.dateDepot));
+    setHasDateUpdate(true);
     setDao((prev) => (prev ? { ...prev, dateDepot: nextIso } : prev));
     markDirty();
     setIsEditingDate(false);
@@ -978,7 +982,7 @@ export default function DaoDetail() {
 
   const currentDateInfo = formatDate(dao.dateDepot);
   const isDateUpdated =
-    initialDateDepot !== null && initialDateDepot !== dao.dateDepot;
+    (initialDateDepot !== null && initialDateDepot !== dao.dateDepot) || hasDateUpdate;
   const previousDateInfo =
     isDateUpdated && initialDateDepot ? formatDate(initialDateDepot) : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
@@ -1000,8 +1004,19 @@ export default function DaoDetail() {
   const handleValidate = async () => {
     if (!dao) return;
     try {
-      const updated = await apiService.updateDao(dao.id, dao);
+      const payload = {
+        objetDossier: dao.objetDossier,
+        reference: dao.reference,
+        autoriteContractante: dao.autoriteContractante,
+        dateDepot: dao.dateDepot,
+        equipe: dao.equipe,
+      } as Partial<Dao>;
+      const updated = await apiService.updateDao(dao.id, payload, true);
       setDao(updated);
+      // Si la date retournée diffère de l'initiale, s'assurer que le bandeau reste affiché
+      if (initialDateDepot !== null && updated.dateDepot !== initialDateDepot) {
+        setHasDateUpdate(true);
+      }
       markSaved();
       setStagedComments({});
       toast({
@@ -1180,7 +1195,7 @@ export default function DaoDetail() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="space-y-2">
+              <div className="space-y-2 order-1">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
                     Référence
@@ -1222,10 +1237,10 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 order-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
-                    Date de dépôt
+                    {isDateUpdated ? "Date de dépôt initiale" : "Date de dépôt"}
                   </Label>
                   {false && !isEditingDate && isAdmin() && (
                     <Button
@@ -1253,9 +1268,6 @@ export default function DaoDetail() {
                         "—"
                       )}
                     </span>
-                    <p className="text-xs text-muted-foreground">
-                      Date de dépôt initiale
-                    </p>
                   </div>
                 ) : (
                   <span
@@ -1271,7 +1283,7 @@ export default function DaoDetail() {
 
                 {isDateUpdated && (
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground block">
                       Nouvelle date de dépôt
                     </Label>
                     <span
@@ -1288,7 +1300,7 @@ export default function DaoDetail() {
 
                 {isEditingDate && (
                   <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
-                    <Label className="text-sm font-medium">
+                    <Label className="text-sm font-medium block">
                       Nouvelle date de dépôt
                     </Label>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -1331,7 +1343,7 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 order-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
                     Autorité contractante
@@ -1416,7 +1428,7 @@ export default function DaoDetail() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Chef d'équipe</Label>
-                {isAdmin() && (
+                {false && isAdmin() && (
                   <TeamEditDialog
                     currentTeam={dao.equipe}
                     onTeamUpdate={handleTeamUpdate}
