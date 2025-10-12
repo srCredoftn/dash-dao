@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { devLog } from "@/utils/devLogger";
@@ -79,6 +80,9 @@ export default function DaoDetail() {
   const [tempReference, setTempReference] = useState("");
   const [isEditingObjet, setIsEditingObjet] = useState(false);
   const [tempObjet, setTempObjet] = useState("");
+  const [isEditingDate, setIsEditingDate] = useState(false);
+  const [tempDateDepot, setTempDateDepot] = useState("");
+  const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
@@ -149,6 +153,18 @@ export default function DaoDetail() {
 
     loadDao();
   }, [id]);
+
+  useEffect(() => {
+    setInitialDateDepot(null);
+    setIsEditingDate(false);
+    setTempDateDepot("");
+  }, [id]);
+
+  useEffect(() => {
+    if (dao && id && dao.id === id && !initialDateDepot) {
+      setInitialDateDepot(dao.dateDepot);
+    }
+  }, [dao, id, initialDateDepot]);
 
   // Écrans d'état (chargement / erreur / introuvable)
   if (loading) {
@@ -828,27 +844,111 @@ export default function DaoDetail() {
     setIsEditingObjet(false);
   };
 
+  const handleStartEditingDate = () => {
+    if (!dao) return;
+    setTempDateDepot(toDateInputValue(dao.dateDepot));
+    setIsEditingDate(true);
+  };
+
+  const handleCancelEditingDate = () => {
+    setIsEditingDate(false);
+    setTempDateDepot("");
+  };
+
+  const handleSaveDate = () => {
+    if (!dao) return;
+    const nextIso = toIsoFromInputValue(tempDateDepot);
+    if (!nextIso) {
+      toast({
+        title: "Date invalide",
+        description: "Veuillez sélectionner une date de dépôt valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (nextIso === dao.dateDepot) {
+      setIsEditingDate(false);
+      setTempDateDepot("");
+      return;
+    }
+
+    setInitialDateDepot((prev) => (prev !== null ? prev : dao.dateDepot));
+    setDao((prev) => (prev ? { ...prev, dateDepot: nextIso } : prev));
+    markDirty();
+    setIsEditingDate(false);
+    setTempDateDepot("");
+  };
+
   // Utilitaires d'affichage
+  const toDateInputValue = (value: string) => {
+    if (!value) return "";
+    if (value.includes("T")) {
+      return value.split("T")[0];
+    }
+    return value.slice(0, 10);
+  };
+
+  const toIsoFromInputValue = (value: string) => {
+    if (!value) return "";
+    if (value.includes("T")) {
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
+    }
+    const candidate = new Date(`${value}T00:00:00.000Z`);
+    return Number.isNaN(candidate.getTime()) ? "" : candidate.toISOString();
+  };
+
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    if (!dateString) {
+      return {
+        date: "—",
+        daysDiff: 0,
+        daysDiffAbs: 0,
+        isOverdue: false,
+      };
+    }
+    const parsed = new Date(dateString);
+    if (Number.isNaN(parsed.getTime())) {
+      return {
+        date: "Date invalide",
+        daysDiff: 0,
+        daysDiffAbs: 0,
+        isOverdue: false,
+      };
+    }
     const today = new Date();
-    const daysDiff = Math.ceil(
-      (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    const normalizedToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
     );
-    const formattedDate = date.toLocaleDateString("fr-FR", {
+    const normalizedTarget = new Date(
+      parsed.getFullYear(),
+      parsed.getMonth(),
+      parsed.getDate(),
+    );
+    const diffMs = normalizedTarget.getTime() - normalizedToday.getTime();
+    const daysDiff = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const formattedDate = normalizedTarget.toLocaleDateString("fr-FR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
     return {
       date: formattedDate,
-      daysDiff: daysDiff,
+      daysDiff,
       daysDiffAbs: Math.abs(daysDiff),
       isOverdue: daysDiff < 0,
     };
   };
 
-  const dateInfo = formatDate(dao.dateDepot);
+  const currentDateInfo = formatDate(dao.dateDepot);
+  const isDateUpdated =
+    initialDateDepot !== null && initialDateDepot !== dao.dateDepot;
+  const previousDateInfo =
+    isDateUpdated && initialDateDepot ? formatDate(initialDateDepot) : null;
+  const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
+  const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const completedTasks = dao.tasks.filter(
     (task) => task.isApplicable && (task.progress || 0) >= 100,
   ).length;
@@ -1074,21 +1174,113 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">
-                  Date de dépôt
-                </Label>
-                <div className="flex items-center gap-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm text-muted-foreground">
+                    Date de dépôt
+                  </Label>
+                  {!isEditingDate && isAdmin() && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={handleStartEditingDate}
+                      aria-label="Modifier la date de dépôt"
+                    >
+                      <Edit3 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+
+                {isDateUpdated ? (
+                  <div className="space-y-1">
+                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                      {previousDateInfo ? (
+                        <>
+                          {previousDateInfo.date} (
+                          {previousDateInfo.daysDiffAbs}j{" "}
+                          {previousDateInfo.isOverdue ? "dépassé" : "restants"})
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      Date de dépôt initiale
+                    </p>
+                  </div>
+                ) : (
                   <span
                     className={cn(
                       "px-2 py-1 rounded text-sm font-medium blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
-                    {dateInfo.date} ({dateInfo.daysDiffAbs}j{" "}
-                    {dateInfo.isOverdue ? "dépassé" : "restants"})
+                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                    {currentDateInfo.isOverdue ? "dépassé" : "restants"})
                   </span>
-                </div>
+                )}
+
+                {isDateUpdated && (
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Nouvelle date de dépôt
+                    </Label>
+                    <span
+                      className={cn(
+                        "px-2 py-1 rounded text-sm font-medium blink-attention",
+                        getBlinkingDateClasses(progress, dao.dateDepot),
+                      )}
+                    >
+                      {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                      {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                    </span>
+                  </div>
+                )}
+
+                {isEditingDate && (
+                  <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
+                    <Label className="text-sm font-medium">
+                      Nouvelle date de dépôt
+                    </Label>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <Input
+                        type="date"
+                        value={tempDateDepot}
+                        onChange={(event) =>
+                          setTempDateDepot(event.target.value)
+                        }
+                        className="w-full sm:max-w-xs"
+                      />
+                      {tempDateInfo && (
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded text-sm font-medium blink-attention",
+                            getBlinkingDateClasses(
+                              progress,
+                              tempDateIso || dao.dateDepot,
+                            ),
+                          )}
+                        >
+                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
+                          {tempDateInfo.isOverdue ? "dépassé" : "restants"})
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" onClick={handleSaveDate}>
+                        Sauvegarder
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEditingDate}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -1231,7 +1423,7 @@ export default function DaoDetail() {
                     onAssignmentChange={handleTaskAssignmentChange}
                     onTaskUpdate={handleTaskUpdate}
                     availableMembers={dao.equipe}
-                    daysDiff={dateInfo.daysDiff}
+                    daysDiff={currentDateInfo.daysDiff}
                     taskIndex={displayIndex}
                     stagingMode={true}
                     stagedComments={staged}
