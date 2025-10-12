@@ -162,7 +162,7 @@ router.get("/next-number", authenticate, async (req, res) => {
       },
     );
     res.status(500).json({
-      error: "Échec de génération du prochain numéro de DAO",
+      error: "Échec de gén��ration du prochain numéro de DAO",
       code: "GENERATION_ERROR",
     });
   }
@@ -382,16 +382,27 @@ router.put(
         updates.autoriteContractante = sanitizeString(
           validatedData.autoriteContractante,
         );
-      if (validatedData.dateDepot)
+
+      const before = await DaoService.getDaoById(id);
+
+      if (validatedData.dateDepot) {
         updates.dateDepot = validatedData.dateDepot;
+        // Si la date change et qu'aucune date initiale n'est encore stockée, la fixer
+        if (
+          before &&
+          (!before.initialDateDepot || before.initialDateDepot.trim() === "") &&
+          before.dateDepot !== validatedData.dateDepot
+        ) {
+          updates.initialDateDepot = before.dateDepot;
+        }
+      }
+
       if (validatedData.equipe)
         updates.equipe = validatedData.equipe.map((m) => ({
           ...m,
           name: sanitizeString(m.name),
         }));
       if (validatedData.tasks) updates.tasks = validatedData.tasks as any;
-
-      const before = await DaoService.getDaoById(id);
 
       // Restreindre l’admin (non-chef) de changer la progression/l’applicabilité/les assignations des tâches via mise à jour de masse
       try {
@@ -725,6 +736,8 @@ router.put(
             changedKeys.add("autoriteContractante");
           if (before.dateDepot !== updated.dateDepot)
             changedKeys.add("dateDepot");
+          if ((before.initialDateDepot || "") !== (updated.initialDateDepot || ""))
+            changedKeys.add("initialDateDepot");
           if ((res as any).teamChanged === true) {
             changedKeys.add("chef");
             changedKeys.add("membres");
