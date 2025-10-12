@@ -1290,7 +1290,7 @@ export default function DaoDetail() {
                 )}
 
                 <div className="mt-3 space-y-1">
-                  <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold">Nouvelle date de dépôt</Label>
+                  <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">Nouvelle date de dépôt</Label>
                   <span
                     className={cn(
                       "px-2 py-1 rounded text-sm font-medium blink-attention",
