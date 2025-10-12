@@ -1000,7 +1000,14 @@ export default function DaoDetail() {
   const handleValidate = async () => {
     if (!dao) return;
     try {
-      const updated = await apiService.updateDao(dao.id, dao);
+      const payload = {
+        objetDossier: dao.objetDossier,
+        reference: dao.reference,
+        autoriteContractante: dao.autoriteContractante,
+        dateDepot: dao.dateDepot,
+        equipe: dao.equipe,
+      } as Partial<Dao>;
+      const updated = await apiService.updateDao(dao.id, payload);
       setDao(updated);
       markSaved();
       setStagedComments({});
