@@ -287,7 +287,8 @@ export default function DaoDetail() {
     if (!dao) return;
     setDao((prev) => {
       if (!prev) return prev;
-      const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
+      const dateChanged =
+        updates.dateDepot && updates.dateDepot !== prev.dateDepot;
       if (dateChanged) {
         setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
       }
@@ -1165,7 +1166,12 @@ export default function DaoDetail() {
               {isAdmin() && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Ouvrir le menu DAO">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      aria-label="Ouvrir le menu DAO"
+                    >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
