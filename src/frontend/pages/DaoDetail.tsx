@@ -224,7 +224,7 @@ export default function DaoDetail() {
   ) => {
     if (!dao) return;
 
-    // MAJ optimiste locale uniquement (stagé) �� ne pas persister immédiatement
+    // MAJ optimiste locale uniquement (stagé) — ne pas persister immédiatement
     setDao((prev) =>
       prev
         ? {
@@ -419,7 +419,7 @@ export default function DaoDetail() {
     const margin = 14;
     let y = margin;
 
-    // Utilitaires d'ent��te
+    // Utilitaires d'entête
     const LOGO_URL = "/logo.png";
     const loadImageAsPngDataUrl = (url: string) =>
       new Promise<{ dataUrl: string; width: number; height: number }>(
@@ -1439,6 +1439,13 @@ export default function DaoDetail() {
             </div>
           </CardContent>
         </Card>
+
+        <EditDaoDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          dao={dao}
+          onSave={handleBulkDaoEditSave}
+        />
 
         {/* Détail des tâches */}
         <Card>
