@@ -1240,7 +1240,7 @@ export default function DaoDetail() {
                 )}
 
                 <div className="mt-3 space-y-1">
-                  <Label className="text-sm text-muted-foreground">Date de dépôt initiale</Label>
+                  <Label className="text-sm text-muted-foreground block">Date de dépôt initiale</Label>
                   <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
                     {(previousDateInfo ?? currentDateInfo).date} ({(previousDateInfo ?? currentDateInfo).daysDiffAbs}j { (previousDateInfo ?? currentDateInfo).isOverdue ? "dépassé" : "restants"})
                   </span>
