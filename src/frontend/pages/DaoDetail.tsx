@@ -1225,7 +1225,7 @@ export default function DaoDetail() {
               <div className="space-y-3 order-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
-                    Date de dépôt
+                    {isDateUpdated ? "Date de dépôt initiale" : "Date de dépôt"}
                   </Label>
                   {false && !isEditingDate && isAdmin() && (
                     <Button
@@ -1253,9 +1253,6 @@ export default function DaoDetail() {
                         "—"
                       )}
                     </span>
-                    <p className="text-xs text-muted-foreground">
-                      Date de dépôt initiale
-                    </p>
                   </div>
                 ) : (
                   <span
@@ -1271,7 +1268,7 @@ export default function DaoDetail() {
 
                 {isDateUpdated && (
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground block">
                       Nouvelle date de dépôt
                     </Label>
                     <span
@@ -1288,7 +1285,7 @@ export default function DaoDetail() {
 
                 {isEditingDate && (
                   <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
-                    <Label className="text-sm font-medium">
+                    <Label className="text-sm font-medium block">
                       Nouvelle date de dépôt
                     </Label>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
