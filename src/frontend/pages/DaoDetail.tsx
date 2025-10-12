@@ -1331,45 +1331,112 @@ export default function DaoDetail() {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
-                    Autorité contractante
+                    Date de dépôt
                   </Label>
-                  {false && !isEditingAuthority && isAdmin() && (
+                  {false && !isEditingDate && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-6 w-6 p-0"
-                      onClick={handleStartEditingAuthority}
+                      onClick={handleStartEditingDate}
+                      aria-label="Modifier la date de d��pôt"
                     >
                       <Edit3 className="h-3 w-3" />
                     </Button>
                   )}
                 </div>
-                {isEditingAuthority ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={tempAuthority}
-                      onChange={(e) => setTempAuthority(e.target.value)}
-                      placeholder="Saisir l'autorité contractante..."
-                      className="font-medium"
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveAuthority}>
+
+                {isDateUpdated ? (
+                  <div className="space-y-1">
+                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                      {previousDateInfo ? (
+                        <>
+                          {previousDateInfo.date} (
+                          {previousDateInfo.daysDiffAbs}j{" "}
+                          {previousDateInfo.isOverdue ? "dépassé" : "restants"})
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      Date de dépôt initiale
+                    </p>
+                  </div>
+                ) : (
+                  <span
+                    className={cn(
+                      "px-2 py-1 rounded text-sm font-medium blink-attention",
+                      getBlinkingDateClasses(progress, dao.dateDepot),
+                    )}
+                  >
+                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                    {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                  </span>
+                )}
+
+                {isDateUpdated && (
+                  <div className="space-y-3">
+                    <Label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Nouvelle date de dépôt
+                    </Label>
+                    <span
+                      className={cn(
+                        "px-2 py-1 rounded text-sm font-medium blink-attention",
+                        getBlinkingDateClasses(progress, dao.dateDepot),
+                      )}
+                    >
+                      {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                      {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                    </span>
+                  </div>
+                )}
+
+                {isEditingDate && (
+                  <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
+                    <Label className="text-sm font-medium">
+                      Nouvelle date de dépôt
+                    </Label>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <Input
+                        type="date"
+                        value={tempDateDepot}
+                        onChange={(event) =>
+                          setTempDateDepot(event.target.value)
+                        }
+                        className="w-full sm:max-w-xs"
+                      />
+                      {tempDateInfo && (
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded text-sm font-medium blink-attention",
+                            getBlinkingDateClasses(
+                              progress,
+                              tempDateIso || dao.dateDepot,
+                            ),
+                          )}
+                        >
+                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
+                          {tempDateInfo.isOverdue ? "dépassé" : "restants"})
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" onClick={handleSaveDate}>
                         Sauvegarder
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={handleCancelEditingAuthority}
+                        onClick={handleCancelEditingDate}
                       >
                         Annuler
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
               </div>
             </div>
