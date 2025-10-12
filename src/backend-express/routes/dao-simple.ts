@@ -382,6 +382,8 @@ router.put(
         updates.autoriteContractante = sanitizeString(
           validatedData.autoriteContractante,
         );
+      if (validatedData.dateDepot)
+        updates.dateDepot = validatedData.dateDepot;
       if (validatedData.equipe)
         updates.equipe = validatedData.equipe.map((m) => ({
           ...m,
