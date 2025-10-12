@@ -289,7 +289,8 @@ export default function DaoDetail() {
     if (!dao) return;
     setDao((prev) => {
       if (!prev) return prev;
-      const dateChanged = updates.dateDepot && updates.dateDepot !== prev.dateDepot;
+      const dateChanged =
+        updates.dateDepot && updates.dateDepot !== prev.dateDepot;
       if (dateChanged) {
         setInitialDateDepot((p) => (p !== null ? p : prev.dateDepot));
         setHasDateUpdate(true);
@@ -983,9 +984,13 @@ export default function DaoDetail() {
   const currentDateInfo = formatDate(dao.dateDepot);
   const persistedInitial = dao.initialDateDepot || initialDateDepot;
   const isDateUpdated =
-    (persistedInitial !== null && !!persistedInitial && persistedInitial !== dao.dateDepot) || hasDateUpdate;
-  const previousDateInfo =
-    persistedInitial ? formatDate(persistedInitial) : null;
+    (persistedInitial !== null &&
+      !!persistedInitial &&
+      persistedInitial !== dao.dateDepot) ||
+    hasDateUpdate;
+  const previousDateInfo = persistedInitial
+    ? formatDate(persistedInitial)
+    : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const completedTasks = dao.tasks.filter(
@@ -1015,7 +1020,8 @@ export default function DaoDetail() {
       const updated = await apiService.updateDao(dao.id, payload, true);
       setDao(updated);
       if (
-        (updated.initialDateDepot && updated.initialDateDepot !== updated.dateDepot) ||
+        (updated.initialDateDepot &&
+          updated.initialDateDepot !== updated.dateDepot) ||
         (persistedInitial && persistedInitial !== updated.dateDepot)
       ) {
         setHasDateUpdate(true);
@@ -1183,7 +1189,12 @@ export default function DaoDetail() {
               {isAdmin() && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Ouvrir le menu DAO">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      aria-label="Ouvrir le menu DAO"
+                    >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -1240,13 +1251,19 @@ export default function DaoDetail() {
                 )}
 
                 <div className="mt-3 space-y-2">
-                  <Label className="text-sm text-muted-foreground block">Date de dépôt initiale</Label>
+                  <Label className="text-sm text-muted-foreground block">
+                    Date de dépôt initiale
+                  </Label>
                   <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                    {(previousDateInfo ?? currentDateInfo).date} ({(previousDateInfo ?? currentDateInfo).daysDiffAbs}j { (previousDateInfo ?? currentDateInfo).isOverdue ? "dépassé" : "restants"})
+                    {(previousDateInfo ?? currentDateInfo).date} (
+                    {(previousDateInfo ?? currentDateInfo).daysDiffAbs}j{" "}
+                    {(previousDateInfo ?? currentDateInfo).isOverdue
+                      ? "dépassé"
+                      : "restants"}
+                    )
                   </span>
                 </div>
               </div>
-
 
               <div className="space-y-2 order-2">
                 <div className="flex items-center justify-between">
@@ -1290,41 +1307,60 @@ export default function DaoDetail() {
                 )}
 
                 <div className="mt-3 space-y-2">
-                  <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">Nouvelle date de dépôt</Label>
+                  <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
+                    Nouvelle date de dépôt
+                  </Label>
                   <span
                     className={cn(
                       "px-2 py-1 rounded text-sm font-medium blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
-                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                    {currentDateInfo.isOverdue ? "dépassé" : "restants"})
                   </span>
                 </div>
 
                 {isEditingDate && (
                   <div className="mt-3 space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
-                    <Label className="text-sm font-medium block">Nouvelle date de dépôt</Label>
+                    <Label className="text-sm font-medium block">
+                      Nouvelle date de dépôt
+                    </Label>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                       <Input
                         type="date"
                         value={tempDateDepot}
-                        onChange={(event) => setTempDateDepot(event.target.value)}
+                        onChange={(event) =>
+                          setTempDateDepot(event.target.value)
+                        }
                         className="w-full sm:max-w-xs"
                       />
                       {tempDateInfo && (
                         <span
                           className={cn(
                             "px-2 py-1 rounded text-sm font-medium blink-attention",
-                            getBlinkingDateClasses(progress, tempDateIso || dao.dateDepot),
+                            getBlinkingDateClasses(
+                              progress,
+                              tempDateIso || dao.dateDepot,
+                            ),
                           )}
                         >
-                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j {tempDateInfo.isOverdue ? "dépassé" : "restants"})
+                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
+                          {tempDateInfo.isOverdue ? "dépassé" : "restants"})
                         </span>
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button size="sm" onClick={handleSaveDate}>Sauvegarder</Button>
-                      <Button size="sm" variant="outline" onClick={handleCancelEditingDate}>Annuler</Button>
+                      <Button size="sm" onClick={handleSaveDate}>
+                        Sauvegarder
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEditingDate}
+                      >
+                        Annuler
+                      </Button>
                     </div>
                   </div>
                 )}
