@@ -1239,7 +1239,7 @@ export default function DaoDetail() {
                   <p className="font-medium break-words">{dao.reference}</p>
                 )}
 
-                <div className="mt-3 space-y-1">
+                <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground block">Date de dépôt initiale</Label>
                   <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
                     {(previousDateInfo ?? currentDateInfo).date} ({(previousDateInfo ?? currentDateInfo).daysDiffAbs}j { (previousDateInfo ?? currentDateInfo).isOverdue ? "dépassé" : "restants"})
@@ -1289,7 +1289,7 @@ export default function DaoDetail() {
                   <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
 
-                <div className="mt-3 space-y-1">
+                <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">Nouvelle date de dépôt</Label>
                   <span
                     className={cn(
