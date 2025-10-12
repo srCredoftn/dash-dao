@@ -207,7 +207,7 @@ export default function DaoDetail() {
   /**
    * Gestion des mises à jour de tâche (progress, commentaire, applicabilité, assignations)
    * - Mises à jour optimistes locales
-   * - Persistance via services dédiés
+   * - Persistance via services d��diés
    */
   const handleTaskProgressChange = (
     taskId: number,
@@ -882,12 +882,10 @@ export default function DaoDetail() {
   // Utilitaires d'affichage
   const toDateInputValue = (value: string) => {
     if (!value) return "";
-    if (!value.includes("T")) return value.slice(0, 10);
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-    const offset = date.getTimezoneOffset() * 60000;
-    const local = new Date(date.getTime() - offset);
-    return local.toISOString().slice(0, 10);
+    if (value.includes("T")) {
+      return value.split("T")[0];
+    }
+    return value.slice(0, 10);
   };
 
   const toIsoFromInputValue = (value: string) => {
