@@ -80,6 +80,9 @@ export default function DaoDetail() {
   const [tempReference, setTempReference] = useState("");
   const [isEditingObjet, setIsEditingObjet] = useState(false);
   const [tempObjet, setTempObjet] = useState("");
+  const [isEditingDate, setIsEditingDate] = useState(false);
+  const [tempDateDepot, setTempDateDepot] = useState("");
+  const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
