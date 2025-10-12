@@ -91,6 +91,7 @@ export default function DaoDetail() {
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [tempDateDepot, setTempDateDepot] = useState("");
   const [initialDateDepot, setInitialDateDepot] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const markDirty = useCallback(() => {
     setHasPendingChanges(true);
@@ -116,7 +117,7 @@ export default function DaoDetail() {
         setDao(fetchedDao);
         markSaved();
 
-        // Déterminer s'il s'agit du dernier DAO cr��é (fonctionnalité admin)
+        // D��terminer s'il s'agit du dernier DAO cr��é (fonctionnalité admin)
         try {
           const next = await apiService.getNextDaoNumber();
           const m = next.match(/^DAO-(\d{4})-(\d{3})$/i);
