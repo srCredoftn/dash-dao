@@ -1419,7 +1419,7 @@ export default function DaoDetail() {
                     onAssignmentChange={handleTaskAssignmentChange}
                     onTaskUpdate={handleTaskUpdate}
                     availableMembers={dao.equipe}
-                    daysDiff={dateInfo.daysDiff}
+                    daysDiff={currentDateInfo.daysDiff}
                     taskIndex={displayIndex}
                     stagingMode={true}
                     stagedComments={staged}
