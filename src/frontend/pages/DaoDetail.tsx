@@ -156,6 +156,8 @@ export default function DaoDetail() {
 
   useEffect(() => {
     setInitialDateDepot(null);
+    setIsEditingDate(false);
+    setTempDateDepot("");
   }, [id]);
 
   useEffect(() => {
