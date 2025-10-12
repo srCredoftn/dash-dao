@@ -34,7 +34,8 @@ export interface Dao {
   objetDossier: string;
   reference: string;
   autoriteContractante: string;
-  dateDepot: string; // chaîne ISO
+  dateDepot: string; // chaîne ISO (date courante)
+  initialDateDepot?: string; // première date de dépôt enregistrée
   equipe: TeamMember[];
   tasks: DaoTask[];
   createdAt: string;
