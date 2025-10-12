@@ -946,9 +946,7 @@ export default function DaoDetail() {
   const isDateUpdated =
     initialDateDepot !== null && initialDateDepot !== dao.dateDepot;
   const previousDateInfo =
-    isDateUpdated && initialDateDepot
-      ? formatDate(initialDateDepot)
-      : null;
+    isDateUpdated && initialDateDepot ? formatDate(initialDateDepot) : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const completedTasks = dao.tasks.filter(
@@ -1199,7 +1197,8 @@ export default function DaoDetail() {
                     <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
                       {previousDateInfo ? (
                         <>
-                          {previousDateInfo.date} ({previousDateInfo.daysDiffAbs}j{" "}
+                          {previousDateInfo.date} (
+                          {previousDateInfo.daysDiffAbs}j{" "}
                           {previousDateInfo.isOverdue ? "dépassé" : "restants"})
                         </>
                       ) : (
@@ -1241,19 +1240,26 @@ export default function DaoDetail() {
 
                 {isEditingDate && (
                   <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
-                    <Label className="text-sm font-medium">Nouvelle date de dépôt</Label>
+                    <Label className="text-sm font-medium">
+                      Nouvelle date de dépôt
+                    </Label>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                       <Input
                         type="date"
                         value={tempDateDepot}
-                        onChange={(event) => setTempDateDepot(event.target.value)}
+                        onChange={(event) =>
+                          setTempDateDepot(event.target.value)
+                        }
                         className="w-full sm:max-w-xs"
                       />
                       {tempDateInfo && (
                         <span
                           className={cn(
                             "px-2 py-1 rounded text-sm font-medium blink-attention",
-                            getBlinkingDateClasses(progress, tempDateIso || dao.dateDepot),
+                            getBlinkingDateClasses(
+                              progress,
+                              tempDateIso || dao.dateDepot,
+                            ),
                           )}
                         >
                           {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
