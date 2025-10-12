@@ -172,7 +172,7 @@ export default function DaoDetail() {
 
   useEffect(() => {
     if (dao && id && dao.id === id && !initialDateDepot) {
-      setInitialDateDepot(dao.dateDepot);
+      setInitialDateDepot(dao.initialDateDepot ?? dao.dateDepot);
     }
   }, [dao, id, initialDateDepot]);
 
@@ -981,10 +981,11 @@ export default function DaoDetail() {
   };
 
   const currentDateInfo = formatDate(dao.dateDepot);
+  const persistedInitial = dao.initialDateDepot || initialDateDepot;
   const isDateUpdated =
-    (initialDateDepot !== null && initialDateDepot !== dao.dateDepot) || hasDateUpdate;
+    (persistedInitial !== null && !!persistedInitial && persistedInitial !== dao.dateDepot) || hasDateUpdate;
   const previousDateInfo =
-    isDateUpdated && initialDateDepot ? formatDate(initialDateDepot) : null;
+    persistedInitial ? formatDate(persistedInitial) : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const completedTasks = dao.tasks.filter(
@@ -1013,8 +1014,10 @@ export default function DaoDetail() {
       } as Partial<Dao>;
       const updated = await apiService.updateDao(dao.id, payload, true);
       setDao(updated);
-      // Si la date retournée diffère de l'initiale, s'assurer que le bandeau reste affiché
-      if (initialDateDepot !== null && updated.dateDepot !== initialDateDepot) {
+      if (
+        (updated.initialDateDepot && updated.initialDateDepot !== updated.dateDepot) ||
+        (persistedInitial && persistedInitial !== updated.dateDepot)
+      ) {
         setHasDateUpdate(true);
       }
       markSaved();
