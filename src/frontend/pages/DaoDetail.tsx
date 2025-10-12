@@ -845,26 +845,79 @@ export default function DaoDetail() {
   };
 
   // Utilitaires d'affichage
+  const toDateInputValue = (value: string) => {
+    if (!value) return "";
+    if (!value.includes("T")) return value.slice(0, 10);
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const offset = date.getTimezoneOffset() * 60000;
+    const local = new Date(date.getTime() - offset);
+    return local.toISOString().slice(0, 10);
+  };
+
+  const toIsoFromInputValue = (value: string) => {
+    if (!value) return "";
+    if (value.includes("T")) {
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
+    }
+    const candidate = new Date(`${value}T00:00:00.000Z`);
+    return Number.isNaN(candidate.getTime()) ? "" : candidate.toISOString();
+  };
+
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    if (!dateString) {
+      return {
+        date: "—",
+        daysDiff: 0,
+        daysDiffAbs: 0,
+        isOverdue: false,
+      };
+    }
+    const parsed = new Date(dateString);
+    if (Number.isNaN(parsed.getTime())) {
+      return {
+        date: "Date invalide",
+        daysDiff: 0,
+        daysDiffAbs: 0,
+        isOverdue: false,
+      };
+    }
     const today = new Date();
-    const daysDiff = Math.ceil(
-      (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    const normalizedToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
     );
-    const formattedDate = date.toLocaleDateString("fr-FR", {
+    const normalizedTarget = new Date(
+      parsed.getFullYear(),
+      parsed.getMonth(),
+      parsed.getDate(),
+    );
+    const diffMs = normalizedTarget.getTime() - normalizedToday.getTime();
+    const daysDiff = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const formattedDate = normalizedTarget.toLocaleDateString("fr-FR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
     return {
       date: formattedDate,
-      daysDiff: daysDiff,
+      daysDiff,
       daysDiffAbs: Math.abs(daysDiff),
       isOverdue: daysDiff < 0,
     };
   };
 
-  const dateInfo = formatDate(dao.dateDepot);
+  const currentDateInfo = formatDate(dao.dateDepot);
+  const isDateUpdated =
+    initialDateDepot !== null && initialDateDepot !== dao.dateDepot;
+  const previousDateInfo =
+    isDateUpdated && initialDateDepot
+      ? formatDate(initialDateDepot)
+      : null;
+  const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
+  const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const completedTasks = dao.tasks.filter(
     (task) => task.isApplicable && (task.progress || 0) >= 100,
   ).length;
