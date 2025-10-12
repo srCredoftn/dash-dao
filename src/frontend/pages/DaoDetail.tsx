@@ -224,7 +224,7 @@ export default function DaoDetail() {
   ) => {
     if (!dao) return;
 
-    // MAJ optimiste locale uniquement (stagé) — ne pas persister immédiatement
+    // MAJ optimiste locale uniquement (stagé) �� ne pas persister immédiatement
     setDao((prev) =>
       prev
         ? {
@@ -419,7 +419,7 @@ export default function DaoDetail() {
     const margin = 14;
     let y = margin;
 
-    // Utilitaires d'entête
+    // Utilitaires d'ent��te
     const LOGO_URL = "/logo.png";
     const loadImageAsPngDataUrl = (url: string) =>
       new Promise<{ dataUrl: string; width: number; height: number }>(
@@ -1149,20 +1149,23 @@ export default function DaoDetail() {
                     <CardTitle className="text-lg md:text-xl">
                       {dao.objetDossier}
                     </CardTitle>
-                    {isAdmin() && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={handleStartEditingObjet}
-                        aria-label="Modifier l'objet du dossier"
-                      >
-                        <Edit3 className="h-3 w-3" />
-                      </Button>
-                    )}
                   </div>
                 )}
               </div>
+              {isAdmin() && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Ouvrir le menu DAO">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                      Modifier DAO
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -1172,7 +1175,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Référence
                   </Label>
-                  {!isEditingReference && isAdmin() && (
+                  {false && !isEditingReference && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1214,7 +1217,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Date de dépôt
                   </Label>
-                  {!isEditingDate && isAdmin() && (
+                  {false && !isEditingDate && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1323,7 +1326,7 @@ export default function DaoDetail() {
                   <Label className="text-sm text-muted-foreground">
                     Autorité contractante
                   </Label>
-                  {!isEditingAuthority && isAdmin() && (
+                  {false && !isEditingAuthority && isAdmin() && (
                     <Button
                       variant="ghost"
                       size="sm"
