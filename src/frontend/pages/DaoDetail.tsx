@@ -547,7 +547,7 @@ export default function DaoDetail() {
       const blockHeight =
         headerBlockPadding * 2 + Math.max(leftHeight, rightHeight);
 
-      // Fond + bordure + séparateur vertical
+      // Fond + bordure + s��parateur vertical
       pdf.setFillColor(232, 240, 254);
       pdf.rect(margin, startY, contentWidth, blockHeight, "F");
       pdf.setDrawColor(210, 225, 250);
@@ -1240,7 +1240,7 @@ export default function DaoDetail() {
               <div className="space-y-3 order-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm text-muted-foreground">
-                    {isDateUpdated ? "Date de dépôt initiale" : "Date de dépôt"}
+                    Date de dépôt initiale
                   </Label>
                   {false && !isEditingDate && isAdmin() && (
                     <Button
@@ -1255,48 +1255,25 @@ export default function DaoDetail() {
                   )}
                 </div>
 
-                {isDateUpdated ? (
-                  <div className="space-y-1">
-                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                      {previousDateInfo ? (
-                        <>
-                          {previousDateInfo.date} (
-                          {previousDateInfo.daysDiffAbs}j{" "}
-                          {previousDateInfo.isOverdue ? "dépassé" : "restants"})
-                        </>
-                      ) : (
-                        "—"
-                      )}
-                    </span>
-                  </div>
-                ) : (
+                <div className="space-y-1">
+                  <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                    {(previousDateInfo ?? currentDateInfo).date} ({(previousDateInfo ?? currentDateInfo).daysDiffAbs}j { (previousDateInfo ?? currentDateInfo).isOverdue ? "dépassé" : "restants"})
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground block">
+                    Nouvelle date de dépôt
+                  </Label>
                   <span
                     className={cn(
                       "px-2 py-1 rounded text-sm font-medium blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
-                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
-                    {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j {currentDateInfo.isOverdue ? "dépassé" : "restants"})
                   </span>
-                )}
-
-                {isDateUpdated && (
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground block">
-                      Nouvelle date de dépôt
-                    </Label>
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-sm font-medium blink-attention",
-                        getBlinkingDateClasses(progress, dao.dateDepot),
-                      )}
-                    >
-                      {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
-                      {currentDateInfo.isOverdue ? "dépassé" : "restants"})
-                    </span>
-                  </div>
-                )}
+                </div>
 
                 {isEditingDate && (
                   <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
@@ -1322,8 +1299,7 @@ export default function DaoDetail() {
                             ),
                           )}
                         >
-                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
-                          {tempDateInfo.isOverdue ? "dépassé" : "restants"})
+                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j {tempDateInfo.isOverdue ? "dépassé" : "restants"})
                         </span>
                       )}
                     </div>
