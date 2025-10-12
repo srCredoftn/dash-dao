@@ -154,6 +154,16 @@ export default function DaoDetail() {
     loadDao();
   }, [id]);
 
+  useEffect(() => {
+    setInitialDateDepot(null);
+  }, [id]);
+
+  useEffect(() => {
+    if (dao && !initialDateDepot) {
+      setInitialDateDepot(dao.dateDepot);
+    }
+  }, [dao, initialDateDepot]);
+
   // Écrans d'état (chargement / erreur / introuvable)
   if (loading) {
     return (
