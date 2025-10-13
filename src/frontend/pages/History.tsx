@@ -173,7 +173,7 @@ function parseDaoUpdated(message: string, data: any) {
     result.summary.push(ln);
     i++;
   }
-  // Changes block until next section header
+  // Bloc des changements jusqu'au prochain en-tête de section
   while (i < work.length) {
     const ln = work[i];
     if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
