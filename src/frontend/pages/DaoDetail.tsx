@@ -912,15 +912,6 @@ export default function DaoDetail() {
     setTempDateDepot("");
   };
 
-  // Utilitaires d'affichage
-  const toDateInputValue = (value: string) => {
-    if (!value) return "";
-    if (value.includes("T")) {
-      return value.split("T")[0];
-    }
-    return value.slice(0, 10);
-  };
-
   const toIsoFromInputValue = (value: string) => {
     if (!value) return "";
     if (value.includes("T")) {
