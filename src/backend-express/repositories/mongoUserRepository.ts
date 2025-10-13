@@ -31,7 +31,7 @@ export class MongoUserRepository implements UserRepository {
     const docs = await UserModel.find({ isActive: true })
       .sort({ createdAt: 1 })
       .exec();
-    return docs.map((d) => d.toObject() as PersistedUser);
+    return docs.map((d: any) => d.toObject() as PersistedUser);
   }
   async create(
     u: Omit<PersistedUser, "id" | "createdAt"> & {
