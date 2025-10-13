@@ -138,7 +138,7 @@ function splitLines(message: string): string[] {
     .filter(Boolean);
 }
 
-// Extract sections for dao_updated
+// Extraire les sections pour les notifications 'dao_updated'
 function parseDaoUpdated(message: string, data: any) {
   const lines = splitLines(message);
   const result: {
