@@ -993,6 +993,8 @@ export default function DaoDetail() {
     : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
+  const showInitialDate = isDateUpdated && previousDateInfo !== null;
+  const dateDepotLabel = isDateUpdated ? "Nouvelle date de dépôt" : "Date de dépôt";
   const completedTasks = dao.tasks.filter(
     (task) => task.isApplicable && (task.progress || 0) >= 100,
   ).length;
@@ -1250,19 +1252,16 @@ export default function DaoDetail() {
                   <p className="font-medium break-words">{dao.reference}</p>
                 )}
 
-                <div className="mt-3 space-y-2">
-                  <Label className="text-sm text-muted-foreground block">
-                    Date de dépôt initiale
-                  </Label>
-                  <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                    {(previousDateInfo ?? currentDateInfo).date} (
-                    {(previousDateInfo ?? currentDateInfo).daysDiffAbs}j{" "}
-                    {(previousDateInfo ?? currentDateInfo).isOverdue
-                      ? "dépassé"
-                      : "restants"}
-                    )
-                  </span>
-                </div>
+                {showInitialDate && (
+                  <div className="mt-3 space-y-2">
+                    <Label className="text-sm text-muted-foreground block">
+                      Date de dépôt initiale
+                    </Label>
+                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2 order-2">
@@ -1308,11 +1307,12 @@ export default function DaoDetail() {
 
                 <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
-                    Nouvelle date de dépôt
+                    {dateDepotLabel}
                   </Label>
                   <span
                     className={cn(
-                      "px-2 py-1 rounded text-sm font-medium blink-attention",
+                      "px-2 py-1 rounded text-sm font-medium",
+                      isDateUpdated && "blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
