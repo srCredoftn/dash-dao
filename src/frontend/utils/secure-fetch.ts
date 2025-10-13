@@ -39,7 +39,7 @@ function createFreshNativeFetch(): typeof fetch {
       error,
     );
   }
-  // Fallback: utiliser la ref globale (peut être interceptée, mais mieux que rien)
+  // Repli : utiliser la référence globale (peut être interceptée, mais mieux que rien)
   try {
     return (window.fetch || (globalThis.fetch as any)).bind(window as any);
   } catch (e) {
