@@ -210,7 +210,7 @@ function parseDaoUpdated(message: string, data: any) {
     if (current) result.tasks.push(current);
   }
 
-  // Prefer structured data if provided
+  // Préférer les données structurées si fournies
   if (Array.isArray(data?.taskChanges) && data.taskChanges.length) {
     result.tasks = data.taskChanges.map((t: any) => ({
       id: t.id,
