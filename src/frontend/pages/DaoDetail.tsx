@@ -993,6 +993,10 @@ export default function DaoDetail() {
     : null;
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
+  const showInitialDate = isDateUpdated && previousDateInfo !== null;
+  const dateDepotLabel = isDateUpdated
+    ? "Nouvelle date de dépôt"
+    : "Date de dépôt";
   const completedTasks = dao.tasks.filter(
     (task) => task.isApplicable && (task.progress || 0) >= 100,
   ).length;
@@ -1250,69 +1254,25 @@ export default function DaoDetail() {
                   <p className="font-medium break-words">{dao.reference}</p>
                 )}
 
-                <div className="mt-3 space-y-2">
-                  <Label className="text-sm text-muted-foreground block">
-                    Date de dépôt initiale
-                  </Label>
-                  <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                    {(previousDateInfo ?? currentDateInfo).date} (
-                    {(previousDateInfo ?? currentDateInfo).daysDiffAbs}j{" "}
-                    {(previousDateInfo ?? currentDateInfo).isOverdue
-                      ? "dépassé"
-                      : "restants"}
-                    )
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2 order-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm text-muted-foreground">
-                    Autorité contractante
-                  </Label>
-                  {false && !isEditingAuthority && isAdmin() && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={handleStartEditingAuthority}
-                    >
-                      <Edit3 className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-                {isEditingAuthority ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={tempAuthority}
-                      onChange={(e) => setTempAuthority(e.target.value)}
-                      placeholder="Saisir l'autorité contractante..."
-                      className="font-medium"
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveAuthority}>
-                        Sauvegarder
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleCancelEditingAuthority}
-                      >
-                        Annuler
-                      </Button>
-                    </div>
+                {showInitialDate && (
+                  <div className="mt-3 space-y-2">
+                    <Label className="text-sm text-muted-foreground block">
+                      Date de dépôt initiale
+                    </Label>
+                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j{" "}
+                      {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
+                    </span>
                   </div>
-                ) : (
-                  <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
 
                 <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
-                    Nouvelle date de dépôt
+                    {dateDepotLabel}
                   </Label>
                   <span
                     className={cn(
-                      "px-2 py-1 rounded text-sm font-medium blink-attention",
+                      "inline-flex items-center mt-2 px-2 py-1 rounded text-sm font-medium blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
@@ -1363,6 +1323,48 @@ export default function DaoDetail() {
                       </Button>
                     </div>
                   </div>
+                )}
+              </div>
+
+              <div className="space-y-2 order-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm text-muted-foreground">
+                    Autorité contractante
+                  </Label>
+                  {false && !isEditingAuthority && isAdmin() && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={handleStartEditingAuthority}
+                    >
+                      <Edit3 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                {isEditingAuthority ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={tempAuthority}
+                      onChange={(e) => setTempAuthority(e.target.value)}
+                      placeholder="Saisir l'autorité contractante..."
+                      className="font-medium"
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleSaveAuthority}>
+                        Sauvegarder
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEditingAuthority}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
               </div>
             </div>

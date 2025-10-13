@@ -114,6 +114,14 @@ class ApiService {
           throw new Error("Session expirée. Veuillez vous reconnecter.");
         }
 
+        // 404: standardiser le message pour faciliter la détection côté client
+        if (response.status === 404) {
+          const notFoundData = await response.json().catch(() => ({}));
+          const message =
+            notFoundData.error || notFoundData.message || "Not Found";
+          throw new Error(`404: ${message}`);
+        }
+
         // Autres erreurs: tenter d'extraire un message JSON sinon generique
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
