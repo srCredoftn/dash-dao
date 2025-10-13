@@ -12,6 +12,13 @@ Performance: cache/partitionnement/bundling optimisés
   - useCallback: mémorise handlers pour éviter rerenders des enfants
   Ce composant est conçu pour être léger et réutilisable dans des listes virtuelles.
 */
+/*
+  FR: Annotations de OptimizedDaoCard.tsx — Carte DAO optimisée
+  - Blocs commentés par fonction/portion:
+    • Helpers: getStatusBadgeVariant, getStatusLabel
+    • Composant memoisé OptimizedDaoCard: gestion navigation, préfetch, expansion mobile, affichage équipe
+    • Performance: useCallback pour formatDate et handlers afin d'éviter rerenders
+*/
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp, User, Users } from "lucide-react";

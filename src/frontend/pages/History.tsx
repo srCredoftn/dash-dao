@@ -130,7 +130,7 @@ function getTypeBadgeVariant(
   }
 }
 
-// Parse message into full lines, no truncation
+// Parser le message en lignes complètes, sans troncature
 function splitLines(message: string): string[] {
   return message
     .split(/\n+/)
@@ -138,7 +138,7 @@ function splitLines(message: string): string[] {
     .filter(Boolean);
 }
 
-// Extract sections for dao_updated
+// Extraire les sections pour les notifications 'dao_updated'
 function parseDaoUpdated(message: string, data: any) {
   const lines = splitLines(message);
   const result: {
@@ -157,40 +157,40 @@ function parseDaoUpdated(message: string, data: any) {
     }>;
   } = { summary: [], changes: [], team: [], tasks: [] };
 
-  // Remove title line if present
+  // Retirer la ligne de titre si elle est présente
   const work = lines[0]?.toLowerCase().includes("mise à jour d’un dao")
     ? lines.slice(1)
     : lines;
 
-  // Collect until blank section headers in original message – we rely on keywords
+  // Collecter jusqu'aux en-têtes de section (vides) dans le message original — on se base sur des mots-clés
   let i = 0;
-  // First block: metadata (Numéro de liste, Autorité, Date...)
+  // Premier bloc : métadonnées (Numéro de liste, Autorité, Date...)
   while (i < work.length) {
     const ln = work[i];
     if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
-    // Stop metadata when we hit first pair-specific change like "… antérieur :"
+    // Arrêter les métadonnées lorsqu'on rencontre le premier changement spécifique (ex: "… antérieur :")
     if (/antérieu|modifié/i.test(ln)) break;
     result.summary.push(ln);
     i++;
   }
-  // Changes block until next section header
+  // Bloc des changements jusqu'au prochain en-tête de section
   while (i < work.length) {
     const ln = work[i];
     if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
     result.changes.push(ln);
     i++;
   }
-  // Team section
+  // Section Équipe
   if (work[i] === "Équipe :") {
     i++;
     while (i < work.length && work[i] !== "Tâches modifiées :") {
       const ln = work[i];
-      // Remove leading numbering like "1. "
+      // Retirer la numérotation en tête comme "1. "
       result.team.push(ln.replace(/^\d+\.\s*/, ""));
       i++;
     }
   }
-  // Tasks section
+  // Section Tâches
   if (work[i] === "Tâches modifiées :") {
     i++;
     let current: { name: string; changes: string[] } | null = null;
@@ -210,7 +210,7 @@ function parseDaoUpdated(message: string, data: any) {
     if (current) result.tasks.push(current);
   }
 
-  // Prefer structured data if provided
+  // Préférer les données structurées si fournies
   if (Array.isArray(data?.taskChanges) && data.taskChanges.length) {
     result.tasks = data.taskChanges.map((t: any) => ({
       id: t.id,
@@ -511,7 +511,8 @@ export default function History() {
 
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
                 <div>
-                  {filtered.length} notification{filtered.length > 1 ? "s" : ""} affichée
+                  {filtered.length} notification{filtered.length > 1 ? "s" : ""}{" "}
+                  affichée
                   {filtered.length > 1 ? "s" : ""}
                 </div>
                 <Button

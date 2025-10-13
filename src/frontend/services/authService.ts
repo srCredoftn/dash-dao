@@ -27,7 +27,7 @@ import {
   startTabSession,
 } from "@/utils/auth-storage";
 import secureFetch from "@/utils/secure-fetch";
-// Utilisation de fetch via secure-fetch (avec fallback) pour contourner les interceptions tierces
+// Utilisation de fetch via secure-fetch (avec repli) pour contourner les interceptions tierces
 
 const API_BASE_URL = "/api/auth";
 
@@ -95,7 +95,7 @@ class AuthApiService {
   /**
    * Requête HTTP générique pour les endpoints d'API d'authentification.
    * - Gère l'ajout des headers (Content-Type, Authorization, Idempotency)
-   * - Utilise secure-fetch avec un fallback vers window.fetch
+   * - Utilise secure-fetch avec un repli vers window.fetch
    * - Tente un refresh de token en cas de 401 et rejoue la requête si possible
    * - Uniformise et traduit certains messages d'erreur réseau pour l'UI
    * @param endpoint Chemin relatif (ex: /login)
@@ -152,7 +152,7 @@ class AuthApiService {
           timeout: 30000,
         } as any);
       } catch (sfError) {
-        // 2) Fallback: fetch natif direct
+        // 2) Repli : fetch natif direct
         console.warn(
           "secureFetch a échoué, tentative de repli sur fetch natif",
         );
@@ -165,7 +165,7 @@ class AuthApiService {
           if (!nativeOptions.method) nativeOptions.method = "GET";
           response = await window.fetch(url, nativeOptions as any);
         } catch (nativeErr) {
-          // Si le fallback échoue aussi, relancer l'erreur initiale
+          // Si le repli échoue aussi, relancer l'erreur initiale
           throw sfError;
         }
       } finally {
@@ -319,13 +319,13 @@ class AuthApiService {
   /**
    * Récupère l'utilisateur stocké (préférence: storage cloisonné par onglet).
    * Pour les environnements de test ou si la session d'onglet n'est pas présente,
-   * on propose un fallback sûr qui lit directement le localStorage.
+   * on propose un repli sûr qui lit directement le localStorage.
    */
   getStoredUser(): AuthUser | null {
     try {
       const user = tabGetUser();
       if (user) return user;
-      // Fallback pour les tests ou environnements sans marqueur de session d'onglet
+      // Repli pour les tests ou environnements sans marqueur de session d'onglet
       const raw = localStorage.getItem("auth_user");
       return raw ? JSON.parse(raw) : null;
     } catch {

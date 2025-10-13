@@ -426,9 +426,9 @@ async function getTransport(excludeHosts: string[] = []) {
     const errors: string[] = [];
     let firstTransport: TransportMeta | null = null;
 
-    const buildTransport = (
+    const buildTransport = async (
       cfg: (typeof candidates)[number],
-    ): TransportMeta => {
+    ): Promise<TransportMeta> => {
       if (!cfg.host) {
         throw new Error(`missing-host:${cfg.name}`);
       }
@@ -459,8 +459,14 @@ async function getTransport(excludeHosts: string[] = []) {
         );
       }
 
+      const createTransportFn =
+        (nodemailer && (nodemailer as any).createTransport) ||
+        ((nodemailer as any).default &&
+          (nodemailer as any).default.createTransport);
+      if (!createTransportFn)
+        throw new Error("nodemailer.createTransport unavailable");
       return {
-        transport: nodemailer.createTransport(options),
+        transport: createTransportFn(options),
         host: cfg.host,
         name: cfg.name,
         mode,
@@ -469,7 +475,7 @@ async function getTransport(excludeHosts: string[] = []) {
 
     for (const cfg of candidates) {
       try {
-        const meta = buildTransport(cfg);
+        const meta = await buildTransport(cfg);
         if (!firstTransport) {
           firstTransport = meta;
         }
@@ -806,6 +812,55 @@ export let sendEmail = async (
   body: string,
   type?: MailType,
 ): Promise<void> => {
+  // Allow forcing all outgoing emails to a single central address for testing/monitoring
+  const centralAddr = normalizeEmail(process.env.SMTP_CENTRAL_ADDRESS || "");
+  const forceToCentral =
+    String(process.env.SMTP_FORCE_TO_CENTRAL || "false").toLowerCase() ===
+    "true";
+
+  if (forceToCentral && centralAddr) {
+    logger.info("SMTP: force sending all emails to central address", "MAIL", {
+      central: centralAddr,
+    });
+    // Replace recipients with central address
+    const recipients = [centralAddr];
+    const smtpSubject = (subject && subject.trim()) || "Gestion des DAOs 2SND";
+    const normalizedBody = body || "";
+    try {
+      const summary = await enqueueEmailJob({
+        recipients,
+        subject: smtpSubject,
+        body: normalizedBody,
+        type,
+      });
+      if (summary.failed === 0) return;
+      if (summary.sent === 0) {
+        const firstError = summary.errors[0];
+        throw new EmailSendError(
+          firstError?.message || "SMTP send failed",
+          firstError?.code,
+          firstError?.code === "transport_unavailable",
+          summary,
+        );
+      }
+    } catch (error) {
+      if (error instanceof EmailSendError) throw error;
+      throw new EmailSendError(
+        String((error as Error)?.message || error),
+        (error as any)?.code || (error as any)?.responseCode,
+        false,
+        {
+          subject: smtpSubject,
+          attempted: 1,
+          sent: 0,
+          failed: 1,
+          errors: [],
+        },
+      );
+    }
+    return;
+  }
+
   const { valid, invalid } = partitionEmails(toArray(to));
   const recipients = Array.from(new Set(valid));
 

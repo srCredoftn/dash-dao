@@ -10,6 +10,14 @@ Liens: ui/* (atomes), hooks, contexts, services côté client
   Les notifications sont gérées via le contexte NotificationContext: ce composant n'héberge
   pas la logique métier, il se contente d'afficher et de naviguer vers la ressource liée.
 */
+/*
+  FR: Annotations de NotificationCenter.tsx — Centre de notifications
+  - Blocs commentés par fonction/portion:
+    • Récupération des notifications via le contexte (useNotifications)
+    • Affichage du popover, gestion ouverture/rafraîchissement
+    • Navigation vers DAO lié (markAsRead + navigate)
+    • Actions: clearAll, removeNotification
+*/
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, BellDot, X } from "lucide-react";

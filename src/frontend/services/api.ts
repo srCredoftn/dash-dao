@@ -89,7 +89,7 @@ class ApiService {
           timeout: 15000,
         } as any);
       } catch (secureErr) {
-        // Fallback: fetch natif en cas d'échec du wrapper sécurité
+        // Repli : utiliser fetch natif en cas d'échec du wrapper sécurisé
         console.warn(
           "secure-fetch a échoué, bascule vers fetch natif :",
           secureErr,

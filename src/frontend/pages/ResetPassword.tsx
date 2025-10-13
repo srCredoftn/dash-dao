@@ -156,7 +156,7 @@ export default function ResetPassword() {
           "Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter.",
       });
 
-      // Redirect to login page
+      // Rediriger vers la page de connexion
       setTimeout(() => {
         navigate("/login");
       }, 2000);

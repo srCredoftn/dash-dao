@@ -11,6 +11,14 @@ Liens: ui/* (atomes), hooks, contexts, services côté client
   - ReactNode: permet d'accepter des enfants rendus dynamiquement
   Les blocs ci-dessous détaillent la logique d'affichage, accessibilité et sécurités (logout).
 */
+/*
+  FR: Annotations de AppHeader.tsx — Entête global
+  - Blocs commentés par fonction/portion:
+    • Gestion de l'état du menu mobile et de l'avatar (useState/useEffect)
+    • Handlers de navigation (profile, history, admin)
+    • Menu utilisateur (desktop) et sidebar mobile
+    • Intégration NotificationCenter
+*/
 import { useState, useEffect, type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";

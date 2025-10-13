@@ -10,6 +10,13 @@ Liens: ui/* (atomes), hooks, contexts, services côté client
   - L'indicateur est animé via transform CSS pour de bonnes performances
   - Ce bloc explique la logique de calcul de la largeur et l'usage de la prop value
 */
+/*
+  FR: Annotations de ui/progress.tsx — Barre de progression
+  - Blocs commentés par fonction/portion:
+    • Progress: wrapper autour de Radix ProgressPrimitive
+    • Indicator: calcul et application de la transformation CSS selon value
+    • Accessibilité: utilisation du composant Radix pour l'a11y
+*/
 import * as React from "react";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 

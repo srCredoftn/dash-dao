@@ -217,7 +217,7 @@ export default function DaoDetail() {
   /**
    * Gestion des mises à jour de tâche (progress, commentaire, applicabilité, assignations)
    * - Mises à jour optimistes locales
-   * - Persistance via services dédiés
+   * - Persistance via services d��diés
    */
   const handleTaskProgressChange = (
     taskId: number,
@@ -882,12 +882,6 @@ export default function DaoDetail() {
     setIsEditingObjet(false);
   };
 
-  const handleStartEditingDate = () => {
-    if (!dao) return;
-    setTempDateDepot(toDateInputValue(dao.dateDepot));
-    setIsEditingDate(true);
-  };
-
   const handleCancelEditingDate = () => {
     setIsEditingDate(false);
     setTempDateDepot("");
@@ -916,15 +910,6 @@ export default function DaoDetail() {
     markDirty();
     setIsEditingDate(false);
     setTempDateDepot("");
-  };
-
-  // Utilitaires d'affichage
-  const toDateInputValue = (value: string) => {
-    if (!value) return "";
-    if (value.includes("T")) {
-      return value.split("T")[0];
-    }
-    return value.slice(0, 10);
   };
 
   const toIsoFromInputValue = (value: string) => {
@@ -1254,18 +1239,6 @@ export default function DaoDetail() {
                   <p className="font-medium break-words">{dao.reference}</p>
                 )}
 
-                {showInitialDate && (
-                  <div className="mt-3 space-y-2">
-                    <Label className="text-sm text-muted-foreground block">
-                      Date de dépôt initiale
-                    </Label>
-                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j{" "}
-                      {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
-                    </span>
-                  </div>
-                )}
-
                 <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
                     {dateDepotLabel}
@@ -1366,6 +1339,19 @@ export default function DaoDetail() {
                 ) : (
                   <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
+
+                {showInitialDate && (
+                  <div className="mt-3 space-y-2">
+                    <Label className="text-sm text-muted-foreground block">
+                      Date de dépôt initiale
+                    </Label>
+                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
+                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j{" "}
+                      {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
+                    </span>
+                  </div>
+                )}
+
               </div>
             </div>
 
@@ -1413,14 +1399,14 @@ export default function DaoDetail() {
                 <Label className="text-sm font-medium">Chef d'équipe</Label>
                 {false && isAdmin() && (
                   <TeamEditDialog
-                    currentTeam={dao.equipe}
+                    currentTeam={dao?.equipe || []}
                     onTeamUpdate={handleTeamUpdate}
                     type="both"
                   />
                 )}
               </div>
               <p className="font-medium break-words">
-                {dao.equipe.find((m) => m.role === "chef_equipe")?.name ||
+                {(dao?.equipe || []).find((m) => m.role === "chef_equipe")?.name ||
                   "Non assigné"}
               </p>
 
@@ -1428,7 +1414,7 @@ export default function DaoDetail() {
                 <Label className="text-sm font-medium">Membres d'équipe</Label>
               </div>
               <div className="space-y-2">
-                {dao.equipe
+                {(dao?.equipe || [])
                   .filter((m) => m.role === "membre_equipe")
                   .map((member) => (
                     <div

@@ -4,6 +4,13 @@ Domaine: Frontend/UI
 Dépendances: react, @radix-ui/react-avatar, @/lib/utils
 Liens: ui/* (atomes), hooks, contexts, services côté client
 */
+/*
+  FR: Annotations de ui/avatar.tsx — Composants Avatar
+  - Blocs commentés par fonction/portion:
+    • Avatar: conteneur principal (taille, forme)
+    • AvatarImage: rendu de l'image et fallback
+    • AvatarFallback: placeholder stylisé
+*/
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 

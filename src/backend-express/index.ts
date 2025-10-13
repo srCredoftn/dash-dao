@@ -304,5 +304,22 @@ export function createServer(): express.Application {
     },
   );
 
+  // Start background services (best-effort)
+  (async () => {
+    try {
+      const mod = await import("./services/criticalReminder");
+      if (mod && typeof mod.startCriticalReminderService === "function") {
+        try {
+          mod.startCriticalReminderService();
+          logger.info("Critical reminder service started (background)", "CRON");
+        } catch (e) {
+          logger.warn("Failed to start critical reminder service", "CRON", { message: String((e as Error)?.message || e) });
+        }
+      }
+    } catch (e) {
+      logger.warn("Critical reminder service not available", "CRON");
+    }
+  })();
+
   return app;
 }

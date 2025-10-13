@@ -8,6 +8,7 @@ Performance: cache/partitionnement/bundling optimisés
 */
 import type { Dao } from "@shared/dao";
 import { connectToDatabase } from "../config/database";
+import { computeDaoProgress } from "./txEmail";
 import { getStorageConfig } from "../config/runtime";
 import { MemoryDaoRepository } from "../repositories/memoryDaoRepository";
 import { MongoDaoRepository } from "../repositories/mongoDaoRepository";
@@ -207,10 +208,87 @@ export class DaoService {
     updates: Partial<Dao>,
   ): Promise<Dao | null> {
     const r = await getRepo();
+
+    // Fetch previous state to detect critical transitions
+    const before = await r.findById(id);
+
     const updated = await r.update(id, {
       ...updates,
       updatedAt: new Date().toISOString(),
     });
+
+    try {
+      if (updated) {
+        // Determine criticality thresholds from env (configurable)
+        const CRIT_DAYS = Math.max(0, Number(process.env.CRITICAL_DAYS_THRESHOLD || 7));
+        const CRIT_PROGRESS = Math.max(0, Number(process.env.CRITICAL_PROGRESS_THRESHOLD || 20));
+        const mode = (process.env.CRITICAL_SEND_MODE || "team").toLowerCase(); // 'team' | 'all' | 'central'
+
+        const isCritical = (dao: Dao | null) => {
+          if (!dao) return false;
+          let critical = false;
+          try {
+            const date = new Date(dao.dateDepot);
+            const diffDays = Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            if (diffDays <= CRIT_DAYS) critical = true;
+          } catch {}
+          try {
+            const progress = computeDaoProgress(dao);
+            if (progress <= CRIT_PROGRESS) critical = true;
+          } catch {}
+          return critical;
+        };
+
+        const wasCritical = isCritical(before);
+        const nowCritical = isCritical(updated);
+
+        if (!wasCritical && nowCritical) {
+          // Compose notification
+          const title = `DAO critique — ${updated.objetDossier}`;
+          const message = `Le DAO ${updated.objetDossier} (${updated.reference}) est devenu critique.`;
+
+          // Send according to mode
+          if (mode === "all") {
+            const { NotificationService } = await import("./notificationService");
+            await NotificationService.add({
+              type: "dao_updated",
+              title,
+              message,
+              data: { daoId: updated.id },
+              recipients: "all",
+            });
+          } else if (mode === "central") {
+            const central = (process.env.SMTP_CENTRAL_ADDRESS || "").trim();
+            if (central) {
+              const { sendEmail } = await import("./txEmail");
+              const subject = title;
+              const body = `${message}\n\nRéférence: ${updated.reference}\nDate dépôt: ${updated.dateDepot}`;
+              await sendEmail(central, subject, body, "DAO_UPDATED");
+            }
+          } else {
+            // team mode: notify members + chef
+            const memberIds = Array.isArray(updated.equipe)
+              ? updated.equipe.map((m) => String((m as any).id))
+              : [];
+            const { NotificationService } = await import("./notificationService");
+            await NotificationService.add({
+              type: "dao_updated",
+              title,
+              message,
+              data: { daoId: updated.id },
+              recipients: memberIds,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Log but don't fail the update flow
+      const { logger } = await import("../utils/logger");
+      logger.warn("Erreur lors de la notification DAO critique", "DAO_SERVICE", {
+        message: String((e as Error)?.message || e),
+      });
+    }
+
     return updated;
   }
 

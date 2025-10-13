@@ -4,6 +4,15 @@
   - useEffect: initialisation et effets dépendants (ex: préchargement)
   Ces hooks sont utilisés pour maintenir la réactivité sans surcharger le store global.
 */
+/*
+  FR: Annotations de Index.tsx — Tableau de bord principal
+  - Blocs commentés par fonction/portion pour faciliter la lecture et maintenance:
+    1) Helpers: getStatusBadgeVariant, getStatusLabel (mapping statut → UI)
+    2) DaoCard_removed: ancienne version de la carte (gardée pour référence)
+    3) Composant Index (export default): chargement des DAO, gestion recherche/filtre, création DAO, hooks d'effet, raccourcis dev
+    4) Sections UI: Statistiques, Recherche/Export, Grille DAO
+  Les commentaires détaillés par bloc suivent dans le fichier (au niveau des fonctions/sections).
+*/
 import { useState, useEffect } from "react";
 /**
  * Tableau de bord des DAO
