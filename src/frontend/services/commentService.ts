@@ -107,7 +107,7 @@ class CommentApiService {
         console.error(`Comment API request failed for ${endpoint}:`, error);
       }
 
-      // Ultime recours: fallback XHR (utile si fetch est intercepté/bloqué)
+      // Dernier recours : repli XHR (utile si fetch est intercepté/bloqué)
       try {
         const data = await new Promise<T>((resolve, reject) => {
           try {
@@ -180,7 +180,7 @@ class CommentApiService {
         daoCommentsCache.set(daoId, { data, ts: Date.now() });
         return data;
       } catch (e) {
-        // Fallback cache périmé si dispo
+        // Repli : utiliser le cache périmé si disponible
         const stale = daoCommentsCache.get(daoId);
         if (stale) return stale.data;
         throw e;
