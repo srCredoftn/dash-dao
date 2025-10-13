@@ -233,7 +233,7 @@ export class DaoService {
             if (diffDays <= CRIT_DAYS) critical = true;
           } catch {}
           try {
-            const progress = (await import('./txEmail')).computeDaoProgress(dao);
+            const progress = computeDaoProgress(dao);
             if (progress <= CRIT_PROGRESS) critical = true;
           } catch {}
           return critical;
