@@ -190,7 +190,7 @@ function parseDaoUpdated(message: string, data: any) {
       i++;
     }
   }
-  // Tasks section
+  // Section Tâches
   if (work[i] === "Tâches modifiées :") {
     i++;
     let current: { name: string; changes: string[] } | null = null;
