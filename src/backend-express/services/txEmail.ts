@@ -459,11 +459,8 @@ async function getTransport(excludeHosts: string[] = []) {
         );
       }
 
-      const nodemailerMod = await import("nodemailer");
-      const createTransportFn = (nodemailerMod && (nodemailerMod as any).createTransport) || ((nodemailerMod as any).default && (nodemailerMod as any).default.createTransport);
-
       return {
-        transport: createTransportFn(options),
+        transport: nodemailer.createTransport(options),
         host: cfg.host,
         name: cfg.name,
         mode,
@@ -472,7 +469,7 @@ async function getTransport(excludeHosts: string[] = []) {
 
     for (const cfg of candidates) {
       try {
-        const meta = await buildTransport(cfg);
+        const meta = buildTransport(cfg);
         if (!firstTransport) {
           firstTransport = meta;
         }
