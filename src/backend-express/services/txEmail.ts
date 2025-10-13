@@ -471,7 +471,7 @@ async function getTransport(excludeHosts: string[] = []) {
 
     for (const cfg of candidates) {
       try {
-        const meta = buildTransport(cfg);
+        const meta = await buildTransport(cfg);
         if (!firstTransport) {
           firstTransport = meta;
         }
