@@ -4,6 +4,13 @@
   - Utilise cva (class-variance-authority) pour garantir des classes cohérentes
   Les commentaires plus bas expliquent le mapping variant->classes et la logique asChild.
 */
+/*
+  FR: Annotations de ui/button.tsx — Composant Button
+  - Blocs commentés par fonction/portion:
+    • Définition des variantes via cva (styles centralisés)
+    • Button (forwardRef): mapping variant/size, support asChild (Slot)
+    • Export des variantes pour réutilisation
+*/
 import * as React from "react";
 /**
  * Bouton unifié (Tailwind + cva)

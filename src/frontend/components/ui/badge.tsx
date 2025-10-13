@@ -6,6 +6,13 @@ Dépendances: react, class-variance-authority, @/lib/utils
 Liens: ui/* (atomes), hooks, contexts, services côté client
 Sécurité: veille à la validation d’entrée, gestion JWT/refresh, et limites de débit
 */
+/*
+  FR: Annotations de ui/badge.tsx — Composant Badge
+  - Blocs commentés par fonction/portion:
+    • badgeVariants (cva): mapping des variantes visuelles
+    • Badge: wrapper rendant les classes et props
+    • Export types pour réutilisation
+*/
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 

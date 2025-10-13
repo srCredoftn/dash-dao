@@ -3,6 +3,13 @@
   - Permet d'utiliser un système de toasts alternatif (Sonner) aligné au thème
   - Les classNames personnalisées garantissent l'homogénéité visuelle avec le design system
 */
+/*
+  FR: Annotations de ui/sonner.tsx — Wrapper Toaster (Sonner)
+  - Blocs commentés par fonction/portion:
+    • Toaster: synchronisation du thème via next-themes
+    • Configuration des classNames pour homogénéité visuelle
+    • Export du composant Toaster pour usage global
+*/
 import { useTheme } from "next-themes";
 /**
  * Toaster (Sonner) synchronisé avec le thème

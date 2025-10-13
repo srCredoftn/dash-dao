@@ -4,6 +4,13 @@
   - Styles inclus pour états focus/disabled et fallback file input
   - Ce bloc de commentaires décrit les props supportées et les choix d'accessibilité
 */
+/*
+  FR: Annotations de ui/input.tsx — Champ Input standardisé
+  - Blocs commentés par fonction/portion:
+    • Input (forwardRef): rendu du <input>, gestion des props natifs et styles
+    • Accessibilité: id/htmlFor, gestion des états disabled/focus
+    • Utilisation: composants de formulaire et intégration avec react-hook-form
+*/
 import * as React from "react";
 /**
  * Champ de saisie (Input) standardisé

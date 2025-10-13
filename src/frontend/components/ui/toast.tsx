@@ -4,6 +4,13 @@
   - Le composant ToastViewport positionne la liste et gère le comportement swipe
   - Les variantes permettent d'afficher des toasts destructifs vs informatifs
 */
+/*
+  FR: Annotations de ui/toast.tsx — Composants Toast (Radix)
+  - Blocs commentés par fonction/portion:
+    • ToastProvider / ToastViewport: positionnement et provider global
+    • Toast / ToastTitle / ToastDescription: structure d'une notification
+    • ToastAction / ToastClose: actions intégrées et fermeture
+*/
 import * as React from "react";
 /**
  * Notifications (Toast) basées sur Radix
