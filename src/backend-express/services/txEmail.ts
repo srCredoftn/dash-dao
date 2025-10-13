@@ -426,9 +426,9 @@ async function getTransport(excludeHosts: string[] = []) {
     const errors: string[] = [];
     let firstTransport: TransportMeta | null = null;
 
-    const buildTransport = (
+    const buildTransport = async (
       cfg: (typeof candidates)[number],
-    ): TransportMeta => {
+    ): Promise<TransportMeta> => {
       if (!cfg.host) {
         throw new Error(`missing-host:${cfg.name}`);
       }
@@ -459,8 +459,11 @@ async function getTransport(excludeHosts: string[] = []) {
         );
       }
 
+      const nodemailerMod = await import("nodemailer");
+      const createTransportFn = (nodemailerMod && (nodemailerMod as any).createTransport) || ((nodemailerMod as any).default && (nodemailerMod as any).default.createTransport);
+
       return {
-        transport: (await import("nodemailer")).createTransport(options),
+        transport: createTransportFn(options),
         host: cfg.host,
         name: cfg.name,
         mode,
@@ -469,7 +472,7 @@ async function getTransport(excludeHosts: string[] = []) {
 
     for (const cfg of candidates) {
       try {
-        const meta = buildTransport(cfg);
+        const meta = await buildTransport(cfg);
         if (!firstTransport) {
           firstTransport = meta;
         }
