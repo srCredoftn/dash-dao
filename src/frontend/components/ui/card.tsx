@@ -4,6 +4,14 @@
   - Les commentaires ci-dessous expliquent les responsabilités de chaque sous-composant
     (layout, spacing, rôle sémantique).
 */
+/*
+  FR: Annotations de ui/card.tsx — Composants Card (atoms)
+  - Blocs commentés par fonction/portion:
+    • Card: conteneur principal réutilisable
+    • CardHeader / CardContent / CardFooter: sections sémantiques
+    • CardTitle / CardDescription: éléments typographiques accessibles
+  Ces petits composants servent de briques pour les écrans du frontend.
+*/
 import * as React from "react";
 /**
  * Composants de carte (Card et sous-sections)
