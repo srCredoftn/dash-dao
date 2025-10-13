@@ -511,7 +511,8 @@ export default function History() {
 
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
                 <div>
-                  {filtered.length} notification{filtered.length > 1 ? "s" : ""} affichée
+                  {filtered.length} notification{filtered.length > 1 ? "s" : ""}{" "}
+                  affichée
                   {filtered.length > 1 ? "s" : ""}
                 </div>
                 <Button

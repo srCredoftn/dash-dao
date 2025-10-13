@@ -459,8 +459,12 @@ async function getTransport(excludeHosts: string[] = []) {
         );
       }
 
-      const createTransportFn = (nodemailer && (nodemailer as any).createTransport) || ((nodemailer as any).default && (nodemailer as any).default.createTransport);
-      if (!createTransportFn) throw new Error("nodemailer.createTransport unavailable");
+      const createTransportFn =
+        (nodemailer && (nodemailer as any).createTransport) ||
+        ((nodemailer as any).default &&
+          (nodemailer as any).default.createTransport);
+      if (!createTransportFn)
+        throw new Error("nodemailer.createTransport unavailable");
       return {
         transport: createTransportFn(options),
         host: cfg.host,
@@ -811,7 +815,8 @@ export let sendEmail = async (
   // Allow forcing all outgoing emails to a single central address for testing/monitoring
   const centralAddr = normalizeEmail(process.env.SMTP_CENTRAL_ADDRESS || "");
   const forceToCentral =
-    String(process.env.SMTP_FORCE_TO_CENTRAL || "false").toLowerCase() === "true";
+    String(process.env.SMTP_FORCE_TO_CENTRAL || "false").toLowerCase() ===
+    "true";
 
   if (forceToCentral && centralAddr) {
     logger.info("SMTP: force sending all emails to central address", "MAIL", {
