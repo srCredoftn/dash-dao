@@ -278,9 +278,10 @@ describe("SMTP transport fallback", () => {
         ).resolves.toBeUndefined();
 
         expect(createTransportMock).toHaveBeenCalledTimes(1);
-        const options = createTransportMock.mock.calls[0][0];
-        expect(options.host).toBe("smtp.test.local");
-        expect(options.auth).toBeUndefined();
+        const call0 = (createTransportMock.mock.calls[0] || []) as any[];
+        const options = call0[0] as any;
+        expect(options && options.host).toBe("smtp.test.local");
+        expect(options && options.auth).toBeUndefined();
         expect(verifyMock).toHaveBeenCalledTimes(1);
         expect(sendMailMock).toHaveBeenCalledTimes(1);
       },
