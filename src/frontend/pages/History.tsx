@@ -185,7 +185,7 @@ function parseDaoUpdated(message: string, data: any) {
     i++;
     while (i < work.length && work[i] !== "Tâches modifiées :") {
       const ln = work[i];
-      // Remove leading numbering like "1. "
+      // Retirer la numérotation en tête comme "1. "
       result.team.push(ln.replace(/^\d+\.\s*/, ""));
       i++;
     }
