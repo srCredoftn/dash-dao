@@ -1408,14 +1408,14 @@ export default function DaoDetail() {
                 <Label className="text-sm font-medium">Chef d'équipe</Label>
                 {false && isAdmin() && (
                   <TeamEditDialog
-                    currentTeam={dao.equipe}
+                    currentTeam={dao?.equipe || []}
                     onTeamUpdate={handleTeamUpdate}
                     type="both"
                   />
                 )}
               </div>
               <p className="font-medium break-words">
-                {dao.equipe.find((m) => m.role === "chef_equipe")?.name ||
+                {(dao?.equipe || []).find((m) => m.role === "chef_equipe")?.name ||
                   "Non assigné"}
               </p>
 
@@ -1423,7 +1423,7 @@ export default function DaoDetail() {
                 <Label className="text-sm font-medium">Membres d'équipe</Label>
               </div>
               <div className="space-y-2">
-                {dao.equipe
+                {(dao?.equipe || [])
                   .filter((m) => m.role === "membre_equipe")
                   .map((member) => (
                     <div
