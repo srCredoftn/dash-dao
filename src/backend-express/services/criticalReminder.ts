@@ -3,6 +3,7 @@ import { DaoService } from "./daoService";
 import { NotificationService } from "./notificationService";
 import { sendEmail, computeDaoProgress } from "./txEmail";
 import { normalizeEmail, isValidEmail } from "../utils/email";
+import { logger } from "../utils/logger";
 
 const DEFAULT_INTERVAL = 24 * 60 * 60 * 1000; // 24h
 const DEFAULT_REPEAT = 24 * 60 * 60 * 1000; // 24h
