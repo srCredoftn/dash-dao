@@ -164,7 +164,7 @@ function parseDaoUpdated(message: string, data: any) {
 
   // Collecter jusqu'aux en-têtes de section (vides) dans le message original — on se base sur des mots-clés
   let i = 0;
-  // First block: metadata (Numéro de liste, Autorité, Date...)
+  // Premier bloc : métadonnées (Numéro de liste, Autorité, Date...)
   while (i < work.length) {
     const ln = work[i];
     if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
