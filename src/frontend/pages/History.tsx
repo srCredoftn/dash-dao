@@ -130,7 +130,7 @@ function getTypeBadgeVariant(
   }
 }
 
-// Parse message into full lines, no truncation
+// Parser le message en lignes complètes, sans troncature
 function splitLines(message: string): string[] {
   return message
     .split(/\n+/)
