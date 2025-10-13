@@ -8,13 +8,14 @@ Performance: cache/partitionnement/bundling optimisés
 */
 import type { Dao } from "@shared/dao";
 import { connectToDatabase } from "../config/database";
+import { computeDaoProgress } from "./txEmail";
 import { getStorageConfig } from "../config/runtime";
 import { MemoryDaoRepository } from "../repositories/memoryDaoRepository";
 import { MongoDaoRepository } from "../repositories/mongoDaoRepository";
 import type { DaoRepository } from "../repositories/daoRepository";
 import { logger } from "../utils/logger";
 
-// Compteur monotone par année pour éviter la réutilisation de numéros apr��s des suppressions
+// Compteur monotone par année pour éviter la réutilisation de numéros après des suppressions
 const lastIssuedSeqByYear: Record<string, number> = {};
 
 let repo: DaoRepository | null = null;
