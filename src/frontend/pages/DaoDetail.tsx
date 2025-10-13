@@ -1266,6 +1266,49 @@ export default function DaoDetail() {
                   </div>
                 )}
 
+              </div>
+
+              <div className="space-y-2 order-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm text-muted-foreground">
+                    Autorité contractante
+                  </Label>
+                  {false && !isEditingAuthority && isAdmin() && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={handleStartEditingAuthority}
+                    >
+                      <Edit3 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                {isEditingAuthority ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={tempAuthority}
+                      onChange={(e) => setTempAuthority(e.target.value)}
+                      placeholder="Saisir l'autorité contractante..."
+                      className="font-medium"
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleSaveAuthority}>
+                        Sauvegarder
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEditingAuthority}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="font-medium">{dao.autoriteContractante}</p>
+                )}
+
                 <div className="mt-3 space-y-2">
                   <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
                     {dateDepotLabel}
@@ -1323,48 +1366,6 @@ export default function DaoDetail() {
                       </Button>
                     </div>
                   </div>
-                )}
-              </div>
-
-              <div className="space-y-2 order-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm text-muted-foreground">
-                    Autorité contractante
-                  </Label>
-                  {false && !isEditingAuthority && isAdmin() && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={handleStartEditingAuthority}
-                    >
-                      <Edit3 className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-                {isEditingAuthority ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={tempAuthority}
-                      onChange={(e) => setTempAuthority(e.target.value)}
-                      placeholder="Saisir l'autorité contractante..."
-                      className="font-medium"
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveAuthority}>
-                        Sauvegarder
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleCancelEditingAuthority}
-                      >
-                        Annuler
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
               </div>
             </div>
