@@ -1269,8 +1269,7 @@ export default function DaoDetail() {
                   </Label>
                   <span
                     className={cn(
-                      "px-2 py-1 rounded text-sm font-medium",
-                      isDateUpdated && "blink-attention",
+                      "px-2 py-1 rounded text-sm font-medium blink-attention",
                       getBlinkingDateClasses(progress, dao.dateDepot),
                     )}
                   >
