@@ -460,7 +460,7 @@ async function getTransport(excludeHosts: string[] = []) {
       }
 
       return {
-        transport: nodemailer.createTransport(options),
+        transport: (await import("nodemailer")).createTransport(options),
         host: cfg.host,
         name: cfg.name,
         mode,
