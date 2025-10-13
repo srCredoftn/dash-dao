@@ -168,7 +168,7 @@ function parseDaoUpdated(message: string, data: any) {
   while (i < work.length) {
     const ln = work[i];
     if (ln === "Équipe :" || ln === "Tâches modifiées :") break;
-    // Stop metadata when we hit first pair-specific change like "… antérieur :"
+    // Arrêter les métadonnées lorsqu'on rencontre le premier changement spécifique (ex: "… antérieur :")
     if (/antérieu|modifié/i.test(ln)) break;
     result.summary.push(ln);
     i++;
