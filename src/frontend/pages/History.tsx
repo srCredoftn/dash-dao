@@ -180,7 +180,7 @@ function parseDaoUpdated(message: string, data: any) {
     result.changes.push(ln);
     i++;
   }
-  // Team section
+  // Section Équipe
   if (work[i] === "Équipe :") {
     i++;
     while (i < work.length && work[i] !== "Tâches modifiées :") {
