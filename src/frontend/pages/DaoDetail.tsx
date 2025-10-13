@@ -882,12 +882,6 @@ export default function DaoDetail() {
     setIsEditingObjet(false);
   };
 
-  const handleStartEditingDate = () => {
-    if (!dao) return;
-    setTempDateDepot(toDateInputValue(dao.dateDepot));
-    setIsEditingDate(true);
-  };
-
   const handleCancelEditingDate = () => {
     setIsEditingDate(false);
     setTempDateDepot("");
