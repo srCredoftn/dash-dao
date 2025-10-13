@@ -157,7 +157,7 @@ function parseDaoUpdated(message: string, data: any) {
     }>;
   } = { summary: [], changes: [], team: [], tasks: [] };
 
-  // Remove title line if present
+  // Retirer la ligne de titre si elle est présente
   const work = lines[0]?.toLowerCase().includes("mise à jour d’un dao")
     ? lines.slice(1)
     : lines;
