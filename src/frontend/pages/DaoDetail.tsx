@@ -1254,18 +1254,64 @@ export default function DaoDetail() {
                   <p className="font-medium break-words">{dao.reference}</p>
                 )}
 
-                {showInitialDate && (
-                  <div className="mt-3 space-y-2">
-                    <Label className="text-sm text-muted-foreground block">
-                      Date de dépôt initiale
+                <div className="mt-3 space-y-2">
+                  <Label className="text-sm text-muted-foreground sm:uppercase sm:text-xs sm:font-semibold block">
+                    {dateDepotLabel}
+                  </Label>
+                  <span
+                    className={cn(
+                      "inline-flex items-center mt-2 px-2 py-1 rounded text-sm font-medium blink-attention",
+                      getBlinkingDateClasses(progress, dao.dateDepot),
+                    )}
+                  >
+                    {currentDateInfo.date} ({currentDateInfo.daysDiffAbs}j{" "}
+                    {currentDateInfo.isOverdue ? "dépassé" : "restants"})
+                  </span>
+                </div>
+
+                {isEditingDate && (
+                  <div className="mt-3 space-y-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/20 p-3">
+                    <Label className="text-sm font-medium block">
+                      Nouvelle date de dépôt
                     </Label>
-                    <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j{" "}
-                      {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
-                    </span>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <Input
+                        type="date"
+                        value={tempDateDepot}
+                        onChange={(event) =>
+                          setTempDateDepot(event.target.value)
+                        }
+                        className="w-full sm:max-w-xs"
+                      />
+                      {tempDateInfo && (
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded text-sm font-medium blink-attention",
+                            getBlinkingDateClasses(
+                              progress,
+                              tempDateIso || dao.dateDepot,
+                            ),
+                          )}
+                        >
+                          {tempDateInfo.date} ({tempDateInfo.daysDiffAbs}j{" "}
+                          {tempDateInfo.isOverdue ? "dépassé" : "restants"})
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" onClick={handleSaveDate}>
+                        Sauvegarder
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEditingDate}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
                   </div>
                 )}
-
               </div>
 
               <div className="space-y-2 order-2">
