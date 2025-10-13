@@ -994,7 +994,9 @@ export default function DaoDetail() {
   const tempDateIso = tempDateDepot ? toIsoFromInputValue(tempDateDepot) : "";
   const tempDateInfo = tempDateIso ? formatDate(tempDateIso) : null;
   const showInitialDate = isDateUpdated && previousDateInfo !== null;
-  const dateDepotLabel = isDateUpdated ? "Nouvelle date de dépôt" : "Date de dépôt";
+  const dateDepotLabel = isDateUpdated
+    ? "Nouvelle date de dépôt"
+    : "Date de dépôt";
   const completedTasks = dao.tasks.filter(
     (task) => task.isApplicable && (task.progress || 0) >= 100,
   ).length;
@@ -1258,7 +1260,8 @@ export default function DaoDetail() {
                       Date de dépôt initiale
                     </Label>
                     <span className="inline-flex items-center rounded border border-muted bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
-                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
+                      {previousDateInfo!.date} ({previousDateInfo!.daysDiffAbs}j{" "}
+                      {previousDateInfo!.isOverdue ? "dépassé" : "restants"})
                     </span>
                   </div>
                 )}
@@ -1321,7 +1324,6 @@ export default function DaoDetail() {
                     </div>
                   </div>
                 )}
-
               </div>
 
               <div className="space-y-2 order-2">
@@ -1364,8 +1366,6 @@ export default function DaoDetail() {
                 ) : (
                   <p className="font-medium">{dao.autoriteContractante}</p>
                 )}
-
-
               </div>
             </div>
 

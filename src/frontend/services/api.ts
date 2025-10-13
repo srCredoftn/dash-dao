@@ -117,7 +117,8 @@ class ApiService {
         // 404: standardiser le message pour faciliter la détection côté client
         if (response.status === 404) {
           const notFoundData = await response.json().catch(() => ({}));
-          const message = notFoundData.error || notFoundData.message || "Not Found";
+          const message =
+            notFoundData.error || notFoundData.message || "Not Found";
           throw new Error(`404: ${message}`);
         }
 
