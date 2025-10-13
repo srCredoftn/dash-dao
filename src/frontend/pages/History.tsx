@@ -162,7 +162,7 @@ function parseDaoUpdated(message: string, data: any) {
     ? lines.slice(1)
     : lines;
 
-  // Collect until blank section headers in original message – we rely on keywords
+  // Collecter jusqu'aux en-têtes de section (vides) dans le message original — on se base sur des mots-clés
   let i = 0;
   // First block: metadata (Numéro de liste, Autorité, Date...)
   while (i < work.length) {
