@@ -459,8 +459,10 @@ async function getTransport(excludeHosts: string[] = []) {
         );
       }
 
+      const createTransportFn = (nodemailer && (nodemailer as any).createTransport) || ((nodemailer as any).default && (nodemailer as any).default.createTransport);
+      if (!createTransportFn) throw new Error("nodemailer.createTransport unavailable");
       return {
-        transport: nodemailer.createTransport(options),
+        transport: createTransportFn(options),
         host: cfg.host,
         name: cfg.name,
         mode,
