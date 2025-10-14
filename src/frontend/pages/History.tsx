@@ -132,6 +132,10 @@ function getTypeBadgeVariant(
   }
 }
 
+function shouldExpandByDefault(type: string): boolean {
+  return type.startsWith("dao_");
+}
+
 // Parser le message en lignes complètes, sans troncature
 function splitLines(message: string): string[] {
   return message
@@ -308,11 +312,15 @@ export default function History() {
     return sorted;
   }, [notifications, timeframe, typeFilter, query, sort]);
 
-  const toggleExpanded = (id: string) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const toggleExpanded = (id: string, defaultValue: boolean) => {
+    setExpandedCards((prev) => {
+      const current = prev[id];
+      const next = current === undefined ? !defaultValue : !current;
+      return {
+        ...prev,
+        [id]: next,
+      };
+    });
   };
 
   const stats = useMemo(() => {
@@ -552,7 +560,10 @@ export default function History() {
               // Prepare structured content by type
               const lines = splitLines(notification.message);
               const cardId = String(notification.id);
-              const isExpanded = !!expandedCards[cardId];
+              const defaultExpanded = shouldExpandByDefault(notification.type);
+              const storedExpanded = expandedCards[cardId];
+              const isExpanded =
+                storedExpanded === undefined ? defaultExpanded : storedExpanded;
 
               return (
                 <Card
@@ -588,7 +599,7 @@ export default function History() {
                         variant="ghost"
                         size="sm"
                         className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
-                        onClick={() => toggleExpanded(cardId)}
+                        onClick={() => toggleExpanded(cardId, defaultExpanded)}
                       >
                         {isExpanded ? (
                           <>
