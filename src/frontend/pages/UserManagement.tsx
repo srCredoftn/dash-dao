@@ -319,7 +319,7 @@ export default function UserManagement() {
       <header className="bg-white border-b">
         <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
           {/* Disposition mobile */}
-          <div className="block sm:hidden">
+          <div className="block md:hidden">
             {/* Première ligne : bouton Retour et titre */}
             <div className="flex items-center space-x-2 mb-3">
               <Button
@@ -349,7 +349,7 @@ export default function UserManagement() {
             {/* Deuxième ligne : bouton d’action pour mobile */}
             <div className="flex justify-center">
               <Button
-                className="w-full sm:w-auto"
+                className="w-full md:w-auto"
                 onClick={() => setIsCreateDialogOpen(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -359,7 +359,7 @@ export default function UserManagement() {
           </div>
 
           {/* Disposition bureau */}
-          <div className="hidden sm:flex items-center justify-between">
+          <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -386,7 +386,7 @@ export default function UserManagement() {
               onOpenChange={setIsCreateDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto">
+                <Button className="w-full md:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Nouvel utilisateur
                 </Button>
@@ -541,70 +541,69 @@ export default function UserManagement() {
                   Chargement des utilisateurs...
                 </div>
               </div>
+            ) : users.length === 0 ? (
+              <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+                Aucun utilisateur pour le moment.
+              </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Utilisateur</TableHead>
-                    <TableHead>Rôle</TableHead>
-                    <TableHead>Dernière connexion</TableHead>
-                    <TableHead>Créé le</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                <div className="space-y-4 md:hidden">
                   {users.map((userData, idx) => (
-                    <TableRow key={userData.id || `${userData.email}-${idx}`}>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{userData.name}</span>
-                          <span className="text-sm text-muted-foreground flex items-center">
-                            <Mail className="h-3 w-3 mr-1" />
-                            {userData.email}
-                          </span>
+                    <div
+                      key={userData.id || `${userData.email}-${idx}`}
+                      className="rounded-lg border bg-white p-4 shadow-sm"
+                    >
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100">
+                            <Users className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-base font-semibold leading-tight">
+                              {userData.name}
+                            </p>
+                            <p className="mt-1 flex items-center text-sm text-muted-foreground break-all">
+                              <Mail className="mr-1.5 h-3.5 w-3.5 flex-shrink-0" />
+                              {userData.email}
+                            </p>
+                          </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getRoleBadgeColor(userData.role)}>
-                          <Shield className="h-3 w-3 mr-1" />
+                        <Badge
+                          className={`${getRoleBadgeColor(userData.role)} w-fit`}
+                        >
+                          <Shield className="mr-1.5 h-3.5 w-3.5" />
                           {getRoleLabel(
                             userData.role,
                             (userData as any).isSuperAdmin,
                           )}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {userData.lastLogin ? (
-                          <span className="text-sm flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {formatDate(userData.lastLogin)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">
-                            Jamais connecté
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {formatDate(userData.createdAt)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                          <div className="flex items-center">
+                            <Calendar className="mr-1.5 h-3.5 w-3.5 flex-shrink-0" />
+                            {userData.lastLogin
+                              ? formatDate(userData.lastLogin)
+                              : "Jamais connecté"}
+                          </div>
+                          <div className="flex items-center">
+                            <Calendar className="mr-1.5 h-3.5 w-3.5 flex-shrink-0" />
+                            Créé le {formatDate(userData.createdAt)}
+                          </div>
+                        </div>
+                        <div className="pt-2">
                           <ConfirmationDialog
                             trigger={
                               <Button
-                                variant="ghost"
+                                variant="destructive"
                                 size="sm"
+                                className="w-full justify-center"
                                 disabled={userData.id === user?.id}
                                 onClick={() => {
                                   setDeletePassword("");
                                   setDeleteError(null);
                                 }}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
                               </Button>
                             }
                             title="Supprimer l'utilisateur"
@@ -642,11 +641,124 @@ export default function UserManagement() {
                             </div>
                           </ConfirmationDialog>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Utilisateur</TableHead>
+                        <TableHead>Rôle</TableHead>
+                        <TableHead>Dernière connexion</TableHead>
+                        <TableHead>Créé le</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((userData, idx) => (
+                        <TableRow
+                          key={userData.id || `${userData.email}-${idx}`}
+                        >
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="font-medium">
+                                {userData.name}
+                              </span>
+                              <span className="text-sm text-muted-foreground flex items-center">
+                                <Mail className="h-3 w-3 mr-1" />
+                                {userData.email}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getRoleBadgeColor(userData.role)}>
+                              <Shield className="h-3 w-3 mr-1" />
+                              {getRoleLabel(
+                                userData.role,
+                                (userData as any).isSuperAdmin,
+                              )}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {userData.lastLogin ? (
+                              <span className="text-sm flex items-center">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                {formatDate(userData.lastLogin)}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                Jamais connecté
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {formatDate(userData.createdAt)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <ConfirmationDialog
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={userData.id === user?.id}
+                                    onClick={() => {
+                                      setDeletePassword("");
+                                      setDeleteError(null);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                }
+                                title="Supprimer l'utilisateur"
+                                description={`Êtes-vous sûr de vouloir supprimer l'utilisateur "${userData.name}" ? Cette action est irréversible.\n\nPour confirmer, entrez le mot de passe du Super Admin.`}
+                                confirmText={
+                                  processingDelete ? "En cours..." : "Supprimer"
+                                }
+                                onConfirm={() =>
+                                  handleDeleteUser(userData.id, userData.name)
+                                }
+                                disabled={
+                                  userData.id === user?.id ||
+                                  deletePassword.length === 0
+                                }
+                                icon="trash"
+                              >
+                                <div className="mt-4 space-y-2">
+                                  <Label
+                                    htmlFor={`delete-password-${userData.id}`}
+                                  >
+                                    Mot de passe Super Admin
+                                  </Label>
+                                  <Input
+                                    id={`delete-password-${userData.id}`}
+                                    type="password"
+                                    value={deletePassword}
+                                    onChange={(e) =>
+                                      setDeletePassword(e.target.value)
+                                    }
+                                    placeholder="Entrez le mot de passe"
+                                  />
+                                  {deleteError && (
+                                    <p className="text-sm text-red-600">
+                                      {deleteError}
+                                    </p>
+                                  )}
+                                </div>
+                              </ConfirmationDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
