@@ -568,7 +568,9 @@ export default function UserManagement() {
                             </p>
                           </div>
                         </div>
-                        <Badge className={`${getRoleBadgeColor(userData.role)} w-fit`}>
+                        <Badge
+                          className={`${getRoleBadgeColor(userData.role)} w-fit`}
+                        >
                           <Shield className="mr-1.5 h-3.5 w-3.5" />
                           {getRoleLabel(
                             userData.role,
@@ -656,10 +658,14 @@ export default function UserManagement() {
                     </TableHeader>
                     <TableBody>
                       {users.map((userData, idx) => (
-                        <TableRow key={userData.id || `${userData.email}-${idx}`}>
+                        <TableRow
+                          key={userData.id || `${userData.email}-${idx}`}
+                        >
                           <TableCell>
                             <div className="flex flex-col">
-                              <span className="font-medium">{userData.name}</span>
+                              <span className="font-medium">
+                                {userData.name}
+                              </span>
                               <span className="text-sm text-muted-foreground flex items-center">
                                 <Mail className="h-3 w-3 mr-1" />
                                 {userData.email}
@@ -724,7 +730,9 @@ export default function UserManagement() {
                                 icon="trash"
                               >
                                 <div className="mt-4 space-y-2">
-                                  <Label htmlFor={`delete-password-${userData.id}`}>
+                                  <Label
+                                    htmlFor={`delete-password-${userData.id}`}
+                                  >
                                     Mot de passe Super Admin
                                   </Label>
                                   <Input
