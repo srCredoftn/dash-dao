@@ -242,6 +242,7 @@ export default function History() {
   const [sort, setSort] = useState<SortOption>("recent");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [query, setQuery] = useState("");
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     refresh().catch(() => {});
