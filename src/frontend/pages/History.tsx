@@ -551,6 +551,8 @@ export default function History() {
 
               // Prepare structured content by type
               const lines = splitLines(notification.message);
+              const cardId = String(notification.id);
+              const isExpanded = !!expandedCards[cardId];
 
               return (
                 <Card
