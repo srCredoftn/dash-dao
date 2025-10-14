@@ -26,12 +26,12 @@ COPY . .
 RUN pnpm build
 
 # --- runtime ---
-FROM node:22-alpine AS runtime
+FROM base AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-# Only copy the built output
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --prod --frozen-lockfile
 COPY --from=build /app/dist /app/dist
-COPY package.json ./package.json
 EXPOSE 3000
 CMD ["node", "dist/server/node-build.mjs"]

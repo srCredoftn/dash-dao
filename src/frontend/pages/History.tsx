@@ -30,6 +30,8 @@ import { GRID_CLASSES } from "@/types/responsive";
 import {
   ArrowLeft,
   BellRing,
+  ChevronDown,
+  ChevronUp,
   FolderKanban,
   History as HistoryIcon,
   ListChecks,
@@ -128,6 +130,10 @@ function getTypeBadgeVariant(
     default:
       return "default";
   }
+}
+
+function shouldExpandByDefault(type: string): boolean {
+  return type.startsWith("dao_");
 }
 
 // Parser le message en lignes complètes, sans troncature
@@ -240,6 +246,9 @@ export default function History() {
   const [sort, setSort] = useState<SortOption>("recent");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [query, setQuery] = useState("");
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>(
+    {},
+  );
 
   useEffect(() => {
     refresh().catch(() => {});
@@ -304,6 +313,17 @@ export default function History() {
 
     return sorted;
   }, [notifications, timeframe, typeFilter, query, sort]);
+
+  const toggleExpanded = (id: string, defaultValue: boolean) => {
+    setExpandedCards((prev) => {
+      const current = prev[id];
+      const next = current === undefined ? !defaultValue : !current;
+      return {
+        ...prev,
+        [id]: next,
+      };
+    });
+  };
 
   const stats = useMemo(() => {
     const total = notifications.length;
@@ -541,6 +561,11 @@ export default function History() {
 
               // Prepare structured content by type
               const lines = splitLines(notification.message);
+              const cardId = String(notification.id);
+              const defaultExpanded = shouldExpandByDefault(notification.type);
+              const storedExpanded = expandedCards[cardId];
+              const isExpanded =
+                storedExpanded === undefined ? defaultExpanded : storedExpanded;
 
               return (
                 <Card
@@ -569,190 +594,225 @@ export default function History() {
                       {daoId && <Badge variant="outline">ID: {daoId}</Badge>}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4 px-5 py-5">
-                    {notification.type === "dao_updated" ? (
-                      (() => {
-                        const s = parseDaoUpdated(
-                          notification.message,
-                          notification.data,
-                        );
-                        const metaPairs = kvFromLines(
-                          s.summary.filter((l) => l.includes(":")),
-                        );
-                        return (
-                          <div className="space-y-4">
-                            {metaPairs.length > 0 && (
-                              <div className="grid gap-2 sm:grid-cols-2">
-                                {metaPairs.map((kv, i) => (
-                                  <div key={i} className="text-sm">
-                                    <span className="text-muted-foreground">
-                                      {kv.label} :{" "}
-                                    </span>
-                                    <span className="font-medium">
-                                      {kv.value}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {s.changes.length > 0 && (
-                              <div>
-                                <div className="mb-2 text-sm font-semibold">
-                                  Changements principaux
-                                </div>
-                                <ul className="list-disc pl-5 space-y-1 text-sm">
-                                  {s.changes.map((c, i) => (
-                                    <li key={i}>{c}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {s.team.length > 0 && (
-                              <div>
-                                <div className="mb-2 text-sm font-semibold">
-                                  Équipe
-                                </div>
-                                <ul className="list-disc pl-5 space-y-1 text-sm">
-                                  {s.team.map((c, i) => (
-                                    <li key={i}>{c}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {s.tasks.length > 0 && (
-                              <div>
-                                <div className="mb-2 text-sm font-semibold">
-                                  Tâches modifiées
-                                </div>
-                                <div className="space-y-3">
-                                  {s.tasks.map((t, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="rounded-md border p-3"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {typeof t.id !== "undefined" && (
-                                          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
-                                            {String(t.id)}
-                                          </span>
-                                        )}
-                                        <div className="text-sm font-medium">
-                                          {t.name}
-                                        </div>
-                                      </div>
-                                      {t.changes.length > 0 && (
-                                        <ul className="mt-2 list-disc pl-5 space-y-1 text-sm">
-                                          {t.changes.map((d, j) => (
-                                            <li key={j}>{d}</li>
-                                          ))}
-                                        </ul>
-                                      )}
-                                      {Array.isArray((t as any).comments) &&
-                                        (t as any).comments.length > 0 && (
-                                          <div className="mt-3">
-                                            <div className="text-xs font-semibold text-muted-foreground mb-1">
-                                              Commentaires
-                                            </div>
-                                            <ul className="space-y-1 text-sm">
-                                              {(t as any).comments.map(
-                                                (c: any, k: number) => (
-                                                  <li
-                                                    key={k}
-                                                    className="flex gap-2"
-                                                  >
-                                                    <span className="font-medium">
-                                                      {c.userName}:
-                                                    </span>
-                                                    <span className="text-muted-foreground">
-                                                      {c.content}
-                                                    </span>
-                                                  </li>
-                                                ),
-                                              )}
-                                            </ul>
-                                          </div>
-                                        )}
+                  <CardContent className="px-5 py-5">
+                    {defaultExpanded && (
+                      <div className="md:hidden mb-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+                          onClick={() =>
+                            toggleExpanded(cardId, defaultExpanded)
+                          }
+                        >
+                          {isExpanded ? (
+                            <>
+                              <ChevronUp className="h-4 w-4" />
+                              Moins d'infos
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-4 w-4" />
+                              Plus d'infos
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        "space-y-4",
+                        defaultExpanded ? "md:block" : "block",
+                        defaultExpanded && !isExpanded ? "hidden" : "block",
+                      )}
+                    >
+                      {notification.type === "dao_updated" ? (
+                        (() => {
+                          const s = parseDaoUpdated(
+                            notification.message,
+                            notification.data,
+                          );
+                          const metaPairs = kvFromLines(
+                            s.summary.filter((l) => l.includes(":")),
+                          );
+                          return (
+                            <div className="space-y-4">
+                              {metaPairs.length > 0 && (
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                  {metaPairs.map((kv, i) => (
+                                    <div key={i} className="text-sm">
+                                      <span className="text-muted-foreground">
+                                        {kv.label} :{" "}
+                                      </span>
+                                      <span className="font-medium">
+                                        {kv.value}
+                                      </span>
                                     </div>
                                   ))}
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()
-                    ) : notification.type === "task_notification" ? (
-                      (() => {
-                        // First block: metadata grid (extract first lines with ":")
-                        const firstBlock: string[] = [];
-                        for (const l of lines) {
-                          if (/^$/i.test(l)) break;
-                          firstBlock.push(l);
-                        }
-                        const meta = kvFromLines(
-                          firstBlock.filter((l) => l.includes(":")),
-                        );
-                        const details: string[] = Array.isArray(
-                          notification.data?.changes,
-                        )
-                          ? notification.data?.changes
-                          : lines.slice(firstBlock.length + 1);
-                        return (
-                          <div className="space-y-4">
-                            {meta.length > 0 && (
-                              <div className="grid gap-2 sm:grid-cols-2">
-                                {meta.map((kv, i) => (
-                                  <div key={i} className="text-sm">
-                                    <span className="text-muted-foreground">
-                                      {kv.label} :{" "}
-                                    </span>
-                                    <span className="font-medium">
-                                      {kv.value}
-                                    </span>
+                              )}
+                              {s.changes.length > 0 && (
+                                <div>
+                                  <div className="mb-2 text-sm font-semibold">
+                                    Changements principaux
                                   </div>
-                                ))}
-                              </div>
-                            )}
-                            {details.length > 0 && (
-                              <div>
-                                <div className="mb-2 text-sm font-semibold">
-                                  Détails
+                                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                                    {s.changes.map((c, i) => (
+                                      <li key={i}>{c}</li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <ul className="list-disc pl-5 space-y-1 text-sm">
-                                  {details.map((d, i) => (
-                                    <li key={i}>{d}</li>
+                              )}
+                              {s.team.length > 0 && (
+                                <div>
+                                  <div className="mb-2 text-sm font-semibold">
+                                    Équipe
+                                  </div>
+                                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                                    {s.team.map((c, i) => (
+                                      <li key={i}>{c}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {s.tasks.length > 0 && (
+                                <div>
+                                  <div className="mb-2 text-sm font-semibold">
+                                    Tâches modifiées
+                                  </div>
+                                  <div className="space-y-3">
+                                    {s.tasks.map((t, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="rounded-md border p-3"
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          {typeof t.id !== "undefined" && (
+                                            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
+                                              {String(t.id)}
+                                            </span>
+                                          )}
+                                          <div className="text-sm font-medium">
+                                            {t.name}
+                                          </div>
+                                        </div>
+                                        {t.changes.length > 0 && (
+                                          <ul className="mt-2 list-disc pl-5 space-y-1 text-sm">
+                                            {t.changes.map((d, j) => (
+                                              <li key={j}>{d}</li>
+                                            ))}
+                                          </ul>
+                                        )}
+                                        {Array.isArray((t as any).comments) &&
+                                          (t as any).comments.length > 0 && (
+                                            <div className="mt-3">
+                                              <div className="text-xs font-semibold text-muted-foreground mb-1">
+                                                Commentaires
+                                              </div>
+                                              <ul className="space-y-1 text-sm">
+                                                {(t as any).comments.map(
+                                                  (c: any, k: number) => (
+                                                    <li
+                                                      key={k}
+                                                      className="flex gap-2"
+                                                    >
+                                                      <span className="font-medium">
+                                                        {c.userName}:
+                                                      </span>
+                                                      <span className="text-muted-foreground">
+                                                        {c.content}
+                                                      </span>
+                                                    </li>
+                                                  ),
+                                                )}
+                                              </ul>
+                                            </div>
+                                          )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()
+                      ) : notification.type === "task_notification" ? (
+                        (() => {
+                          // First block: metadata grid (extract first lines with ":")
+                          const firstBlock: string[] = [];
+                          for (const l of lines) {
+                            if (/^$/i.test(l)) break;
+                            firstBlock.push(l);
+                          }
+                          const meta = kvFromLines(
+                            firstBlock.filter((l) => l.includes(":")),
+                          );
+                          const details: string[] = Array.isArray(
+                            notification.data?.changes,
+                          )
+                            ? notification.data?.changes
+                            : lines.slice(firstBlock.length + 1);
+                          return (
+                            <div className="space-y-4">
+                              {meta.length > 0 && (
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                  {meta.map((kv, i) => (
+                                    <div key={i} className="text-sm">
+                                      <span className="text-muted-foreground">
+                                        {kv.label} :{" "}
+                                      </span>
+                                      <span className="font-medium">
+                                        {kv.value}
+                                      </span>
+                                    </div>
                                   ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()
-                    ) : notification.type === "dao_created" ||
-                      notification.type === "dao_deleted" ? (
-                      (() => {
-                        const items = kvFromLines(lines);
-                        return (
-                          <div className="grid gap-2 sm:grid-cols-2">
-                            {items.map((kv, i) => (
-                              <div key={i} className="text-sm">
-                                <span className="text-muted-foreground">
-                                  {kv.label} :{" "}
-                                </span>
-                                <span className="font-medium">{kv.value}</span>
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      })()
-                    ) : (
-                      <div className="space-y-1">
-                        {lines.map((ln, i) => (
-                          <p key={i} className="text-sm leading-relaxed">
-                            {ln}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                                </div>
+                              )}
+                              {details.length > 0 && (
+                                <div>
+                                  <div className="mb-2 text-sm font-semibold">
+                                    Détails
+                                  </div>
+                                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                                    {details.map((d, i) => (
+                                      <li key={i}>{d}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()
+                      ) : notification.type === "dao_created" ||
+                        notification.type === "dao_deleted" ? (
+                        (() => {
+                          const items = kvFromLines(lines);
+                          return (
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              {items.map((kv, i) => (
+                                <div key={i} className="text-sm">
+                                  <span className="text-muted-foreground">
+                                    {kv.label} :{" "}
+                                  </span>
+                                  <span className="font-medium">
+                                    {kv.value}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        <div className="space-y-1">
+                          {lines.map((ln, i) => (
+                            <p key={i} className="text-sm leading-relaxed">
+                              {ln}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               );
