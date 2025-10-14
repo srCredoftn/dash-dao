@@ -648,7 +648,7 @@ export default function UserManagement() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Utilisateur</TableHead>
-                        <TableHead>R��le</TableHead>
+                        <TableHead>Rôle</TableHead>
                         <TableHead>Dernière connexion</TableHead>
                         <TableHead>Créé le</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
