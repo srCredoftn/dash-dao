@@ -593,27 +593,29 @@ export default function History() {
                     </div>
                   </CardHeader>
                   <CardContent className="px-5 py-5">
-                    <div className="md:hidden mb-3">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
-                        onClick={() => toggleExpanded(cardId, defaultExpanded)}
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp className="h-4 w-4" />
-                            Moins d'infos
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="h-4 w-4" />
-                            Plus d'infos
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                    {defaultExpanded && (
+                      <div className="md:hidden mb-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+                          onClick={() => toggleExpanded(cardId, defaultExpanded)}
+                        >
+                          {isExpanded ? (
+                            <>
+                              <ChevronUp className="h-4 w-4" />
+                              Moins d'infos
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-4 w-4" />
+                              Plus d'infos
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
                     <div
                       className={cn(
                         "space-y-4",
