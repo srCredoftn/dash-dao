@@ -308,6 +308,13 @@ export default function History() {
     return sorted;
   }, [notifications, timeframe, typeFilter, query, sort]);
 
+  const toggleExpanded = (id: string) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   const stats = useMemo(() => {
     const total = notifications.length;
     const byType = notifications.reduce<Record<string, number>>((acc, item) => {
