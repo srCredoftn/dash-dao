@@ -246,7 +246,9 @@ export default function History() {
   const [sort, setSort] = useState<SortOption>("recent");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [query, setQuery] = useState("");
-  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>(
+    {},
+  );
 
   useEffect(() => {
     refresh().catch(() => {});
@@ -600,7 +602,9 @@ export default function History() {
                           variant="ghost"
                           size="sm"
                           className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
-                          onClick={() => toggleExpanded(cardId, defaultExpanded)}
+                          onClick={() =>
+                            toggleExpanded(cardId, defaultExpanded)
+                          }
                         >
                           {isExpanded ? (
                             <>
@@ -791,7 +795,9 @@ export default function History() {
                                   <span className="text-muted-foreground">
                                     {kv.label} :{" "}
                                   </span>
-                                  <span className="font-medium">{kv.value}</span>
+                                  <span className="font-medium">
+                                    {kv.value}
+                                  </span>
                                 </div>
                               ))}
                             </div>
