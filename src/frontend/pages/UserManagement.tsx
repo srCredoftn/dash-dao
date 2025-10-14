@@ -319,7 +319,7 @@ export default function UserManagement() {
       <header className="bg-white border-b">
         <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
           {/* Disposition mobile */}
-          <div className="block sm:hidden">
+          <div className="block md:hidden">
             {/* Première ligne : bouton Retour et titre */}
             <div className="flex items-center space-x-2 mb-3">
               <Button
