@@ -619,8 +619,8 @@ export default function History() {
                     <div
                       className={cn(
                         "space-y-4",
-                        "md:block",
-                        isExpanded ? "block" : "hidden",
+                        defaultExpanded ? "md:block" : "block",
+                        defaultExpanded && !isExpanded ? "hidden" : "block",
                       )}
                     >
                       {notification.type === "dao_updated" ? (
