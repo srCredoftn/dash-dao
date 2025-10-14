@@ -386,7 +386,7 @@ export default function UserManagement() {
               onOpenChange={setIsCreateDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto">
+                <Button className="w-full md:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Nouvel utilisateur
                 </Button>
@@ -648,7 +648,7 @@ export default function UserManagement() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Utilisateur</TableHead>
-                        <TableHead>Rôle</TableHead>
+                        <TableHead>R��le</TableHead>
                         <TableHead>Dernière connexion</TableHead>
                         <TableHead>Créé le</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
